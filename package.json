@@ -1,21 +1,37 @@
 {
-  "name": "hris-v2",
-  "private": true,
-  "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.3.11",
-    "prettier": "^3.7.4",
-    "turbo": "^2.7.3",
-    "typescript": "5.9.2"
-  },
-  "packageManager": "pnpm@9.0.0",
-  "engines": {
-    "node": ">=18"
-  }
+	"name": "hris-v2",
+	"devDependencies": {
+		"@biomejs/biome": "2.3.11",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.2.7",
+		"syncpack": "^13.0.4",
+		"turbo": "^2.7.4",
+		"typescript": "^5.9.3"
+	},
+	"engines": {
+		"node": ">=18"
+	},
+	"lint-staged": {
+		"*.{js,ts,jsx,tsx,json,jsonc}": [
+			"biome check --write --no-errors-on-unmatched"
+		]
+	},
+	"packageManager": "pnpm@9.0.0",
+	"private": true,
+	"scripts": {
+		"api": "pnpm --filter @hris-v2/api",
+		"build": "dotenv -- turbo build",
+		"check-types": "turbo run check-types",
+		"dev": "dotenv -- turbo dev",
+		"format": "biome format --write .",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"postinstall": "pnpm run syncpack:fix && pnpm run syncpack:format",
+		"prepare": "husky",
+		"syncpack:fix": "syncpack fix-mismatches",
+		"syncpack:format": "syncpack format",
+		"syncpack:list": "syncpack list",
+		"syncpack:mismatch": "syncpack list-mismatches",
+		"ui": "pnpm --filter @hris-v2/ui"
+	}
 }

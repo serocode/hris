@@ -1,18 +1,29 @@
 {
-  "name": "api",
-  "type": "module",
-  "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js"
-  },
+  "name": "@hris-v2/api",
   "dependencies": {
     "@hono/node-server": "^1.19.6",
-    "hono": "^4.11.3"
+    "bullmq": "^5.66.5",
+    "drizzle-orm": "^0.45.1",
+    "hono": "^4.11.3",
+    "ioredis": "^5.9.1",
+    "pg": "^8.16.3",
+    "postgres": "^3.4.8"
   },
   "devDependencies": {
-    "@types/node": "^20.11.17",
+    "@hris-v2/api-routes": "workspace:*",
+    "@node-rs/argon2": "^2.0.2",
+    "@types/node": "^24.7.2",
+    "@types/pg": "^8.16.0",
+    "drizzle-kit": "^0.31.8",
+    "rate-limit-redis": "^4.2.3",
+    "stoker": "^2.0.1",
     "tsx": "^4.7.1",
-    "typescript": "^5.8.3"
-  }
+    "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "type": "module"
 }
