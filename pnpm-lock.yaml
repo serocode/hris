@@ -92,20 +92,19 @@ importers:
         version: 5.9.3
 
   packages/api-routes:
-    dependencies:
+    devDependencies:
       '@hono/zod-openapi':
         specifier: ^1.1.3
         version: 1.2.0(hono@4.11.4)(zod@4.3.5)
-      hono:
-        specifier: ^4.11.3
-        version: 4.11.4
-      zod:
-        specifier: ^4.1.12
-        version: 4.3.5
-    devDependencies:
       '@types/node':
         specifier: ^24.7.2
         version: 24.10.7
+      globals:
+        specifier: ^15.12.0
+        version: 15.15.0
+      stoker:
+        specifier: ^1.3.0
+        version: 1.4.3(@hono/zod-openapi@1.2.0(hono@4.11.4)(zod@4.3.5))(hono@4.11.4)(openapi3-ts@4.5.0)
       tsup:
         specifier: ^8.5.0
         version: 8.5.1(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
@@ -1531,6 +1530,10 @@ packages:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
     engines: {node: '>= 6'}
 
+  globals@15.15.0:
+    resolution: {integrity: sha512-7ACyT3wmyp3I61S4fG682L0VA2RGD9otkqGJIwNUMF1SWUombIIk+af1unuDYgMm082aHYwD+mzJvv9Iu8dsgg==}
+    engines: {node: '>=18'}
+
   globby@14.1.0:
     resolution: {integrity: sha512-0Ia46fDOaT7k4og1PDW4YbodWWr3scS2vAr2lTbsplOt2WkKp0vQbkI9wKis/T5LV/dqPjO3bpS/z6GTJB82LA==}
     engines: {node: '>=18'}
@@ -2139,6 +2142,21 @@ packages:
   stdin-discarder@0.2.2:
     resolution: {integrity: sha512-UhDfHmA92YAlNnCfhmq0VeNL5bDbiZGg7sZ2IvPsXubGkiNa9EC+tUTsjBRsYUAz87btI6/1wf4XoVvQ3uRnmQ==}
     engines: {node: '>=18'}
+
+  stoker@1.4.3:
+    resolution: {integrity: sha512-kijg+1PKUY6laFbNcY7hw5OPgg3QhWD+2wAZsk35IqiZfVwU3S/E3DYbemecRT7vdWbWrZ2mzewQrqD4zoJSeQ==}
+    peerDependencies:
+      '@asteasolutions/zod-to-openapi': ^7.0.0
+      '@hono/zod-openapi': '>=0.16.0'
+      hono: ^4.0.0
+      openapi3-ts: ^4.4.0
+    peerDependenciesMeta:
+      '@asteasolutions/zod-to-openapi':
+        optional: true
+      '@hono/zod-openapi':
+        optional: true
+      openapi3-ts:
+        optional: true
 
   stoker@2.0.1:
     resolution: {integrity: sha512-liSQNnJmn8fWSEan7sVaFe6iSHuN3X02fDGLS6snwW+FUuKi5HmKUHm3P+Kzr5xiDPqRpmSTtmGEBbSL9H2zkQ==}
@@ -3414,6 +3432,8 @@ snapshots:
     dependencies:
       is-glob: 4.0.3
 
+  globals@15.15.0: {}
+
   globby@14.1.0:
     dependencies:
       '@sindresorhus/merge-streams': 2.3.0
@@ -4012,6 +4032,13 @@ snapshots:
   statuses@2.0.2: {}
 
   stdin-discarder@0.2.2: {}
+
+  stoker@1.4.3(@hono/zod-openapi@1.2.0(hono@4.11.4)(zod@4.3.5))(hono@4.11.4)(openapi3-ts@4.5.0):
+    dependencies:
+      hono: 4.11.4
+    optionalDependencies:
+      '@hono/zod-openapi': 1.2.0(hono@4.11.4)(zod@4.3.5)
+      openapi3-ts: 4.5.0
 
   stoker@2.0.1(@asteasolutions/zod-to-openapi@8.4.0(zod@4.3.5))(@hono/zod-openapi@1.2.0(hono@4.11.4)(zod@4.3.5))(hono@4.11.4)(openapi3-ts@4.5.0):
     dependencies:

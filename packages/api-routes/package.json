@@ -3,19 +3,24 @@
 	"description": "",
 	"version": "1.0.0",
 	"author": "",
-	"dependencies": {
-		"@hono/zod-openapi": "^1.1.3",
-		"hono": "^4.11.3",
-		"zod": "^4.1.12"
-	},
 	"devDependencies": {
+		"@hono/zod-openapi": "^1.1.3",
 		"@types/node": "^24.7.2",
+		"globals": "^15.12.0",
+		"stoker": "^2.0.1",
 		"tsup": "^8.5.0",
 		"typescript": "^5.9.3"
 	},
+	"files": [
+		"dist/**"
+	],
 	"keywords": [],
 	"license": "ISC",
 	"main": "index.js",
+	"peerDependencies": {
+		"@hono/zod-openapi": "^1.1.3",
+		"stoker": "^2.0.1"
+	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	}

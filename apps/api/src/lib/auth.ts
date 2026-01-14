@@ -7,6 +7,7 @@ export const auth = betterAuth({
     database: drizzleAdapter(db, {
         provider: "pg", 
     }),
+    baseURL: "https://api.hris.localhost",
     emailAndPassword: { 
     enabled: true, 
   }, 
