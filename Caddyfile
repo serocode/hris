@@ -1,6 +1,6 @@
 api.hris.localhost {
 	tls internal
-	reverse_proxy localhost:3333
+	reverse_proxy localhost:3000
 }
 
 hris.localhost {
