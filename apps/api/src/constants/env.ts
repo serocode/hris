@@ -5,3 +5,4 @@ export const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD || 'hris_password
 export const API_PORT = process.env.API_PORT
   ? Number(process.env.API_PORT)
   : 3333;
+export const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL || 'https://api.hris.localhost';
