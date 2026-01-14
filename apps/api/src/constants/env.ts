@@ -4,4 +4,4 @@ export const POSTGRES_USER = process.env.POSTGRES_USER || 'hris_admin';
 export const POSTGRES_PASSWORD = process.env.POSTGRES_PASSWORD || 'hris_password';
 export const API_PORT = process.env.API_PORT
   ? Number(process.env.API_PORT)
-  : 3000;
+  : 3333;

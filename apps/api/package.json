@@ -13,7 +13,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@hris-v2/api-routes": "1.0.0",
+    "@hris-v2/api-routes": "workspace:*",
     "@node-rs/argon2": "^2.0.2",
     "@types/node": "^24.7.2",
     "@types/pg": "^8.16.0",
@@ -24,6 +24,7 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
+    "auth-docs": "open-cli http://api.hris.localhost/api/auth/reference",
     "auth:generate": "npx @better-auth/cli generate --config src/lib/auth.ts",
     "build": "tsc",
     "dev": "tsx watch src/index.ts",

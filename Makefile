@@ -94,13 +94,9 @@ caddy_stop: ## Stop Caddy server
 	@caddy stop || true
 
 ## ---
-## ENVIRONMENT VARIABLES
+## BETTERAUTH COMMANDS
 ## ---
 
-push-env: ## Push .env variables to the vault
-	$(call log,"Pushing .env variables to the vault...")
-	@npx dotenv-vault@latest push
-
-pull-env: ## Pull .env variables from the vault
-	$(call log,"Pulling .env variables from the vault...")
-	@npx dotenv-vault@latest pull
+auth-docs: ## Open BetterAuth documentation
+	$(call log,"Opening BetterAuth documentation...")
+	@pnpm --filter api auth-docs
