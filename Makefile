@@ -67,7 +67,7 @@ generate: ## Generates migration file - does not run the migration
 
 studio: ## Run Drizzle Kit Studio
 	$(call log,"Running Drizzle Kit Studio...")
-	@pnpm --filter api studio
+	@pnpm --filter api studio & sleep 2 && npx open-cli https://local.drizzle.studio
 
 migrate: generate ## Run migration
 	$(call log,"Running migration...")

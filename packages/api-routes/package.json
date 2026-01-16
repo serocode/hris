@@ -3,25 +3,32 @@
 	"description": "",
 	"version": "1.0.0",
 	"author": "",
-	"devDependencies": {
+	"dependencies": {
 		"@hono/zod-openapi": "^1.1.3",
+		"stoker": "^2.0.1",
+		"zod": "^4.1.12"
+	},
+	"devDependencies": {
 		"@types/node": "^24.7.2",
 		"globals": "^15.12.0",
-		"stoker": "^2.0.1",
 		"tsup": "^8.5.0",
 		"typescript": "^5.9.3"
 	},
-	"files": [
-		"dist/**"
-	],
-	"keywords": [],
-	"license": "ISC",
-	"main": "index.js",
-	"peerDependencies": {
-		"@hono/zod-openapi": "^1.1.3",
-		"stoker": "^2.0.1"
+	"exports": {
+		".": "./src/index.ts",
+		"./errors": "./src/errors.ts",
+		"./files": "./src/files.ts",
+		"./helpers": "./src/helpers.ts"
 	},
+	"files": [
+		"dist/**",
+		"src/**"
+	],
+	"main": "./src/index.ts",
+	"private": true,
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
-	}
+	},
+	"type": "module",
+	"types": "./src/index.ts"
 }
