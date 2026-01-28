@@ -17,7 +17,7 @@ function createErrorSchema(message: string) {
 	return z.object({
 		status: RESPONSE_STATUS,
 		message: z.string().openapi({ example: message }),
-		error: z.any().optional(),
+		error: z.unknown().optional().openapi({ example: {} }),
 	})
 }
 
@@ -117,3 +117,11 @@ export const ServerErrorRoute = createErrorRoute(
 	ServerErrorSchema,
 	"Internal server error",
 )
+
+export const CommonErrorResponses = {
+	...BadRequestErrorRoute,
+	...UnauthorizedErrorRoute,
+	...NotFoundErrorRoute,
+	...ConflictErrorRoute,
+	...ServerErrorRoute,
+} as const

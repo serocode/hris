@@ -100,3 +100,8 @@ caddy_stop: ## Stop Caddy server
 auth-docs: ## Open BetterAuth documentation
 	$(call log,"Opening BetterAuth documentation...")
 	@pnpm --filter api auth-docs
+
+api-docs: ## Open API documentation
+	$(call log,"Opening API documentation...")
+	@pnpm open-cli https://api.hris.localhost/docs
+
