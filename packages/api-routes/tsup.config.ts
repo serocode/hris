@@ -1,12 +1,19 @@
 import { defineConfig, type Options } from "tsup"
 
 export default defineConfig((options: Options) => ({
-	entryPoints: ["src/**/index.ts"],
+	entry: ["src/index.ts", "src/employees/index.ts"],
 	treeshake: true,
 	clean: true,
-	dts: true,
-	format: ["cjs", "esm"],
+	dts: {
+		resolve: true,
+	},
+	format: ["esm", "cjs"],
 	sourcemap: true,
 	splitting: false,
+	outExtension({ format }) {
+		return {
+			js: format === "cjs" ? ".cjs" : ".js",
+		}
+	},
 	...options,
 }))

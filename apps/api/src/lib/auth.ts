@@ -11,6 +11,7 @@ export const auth = betterAuth({
     baseURL: BETTER_AUTH_URL,
     emailAndPassword: { 
     enabled: true, 
+    requireEmailVerification: false,
   }, 
   plugins: [ 
         username(),

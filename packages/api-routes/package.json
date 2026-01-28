@@ -5,6 +5,7 @@
 	"author": "",
 	"dependencies": {
 		"@hono/zod-openapi": "^1.1.3",
+		"hono": "^4.11.4",
 		"stoker": "^2.0.1",
 		"zod": "^4.1.12"
 	},
@@ -15,20 +16,28 @@
 		"typescript": "^5.9.3"
 	},
 	"exports": {
-		".": "./src/index.ts",
-		"./errors": "./src/errors.ts",
-		"./files": "./src/files.ts",
-		"./helpers": "./src/helpers.ts"
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		},
+		"./employees": {
+			"types": "./dist/employees/index.d.ts",
+			"import": "./dist/employees/index.js",
+			"require": "./dist/employees/index.cjs"
+		}
 	},
 	"files": [
-		"dist/**",
-		"src/**"
+		"dist"
 	],
-	"main": "./src/index.ts",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
 	"private": true,
 	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"type": "module",
-	"types": "./src/index.ts"
+	"types": "./dist/index.d.ts"
 }
