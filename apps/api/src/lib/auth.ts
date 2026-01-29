@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { openAPI, username } from "better-auth/plugins";
+import { admin, openAPI, organization, username } from "better-auth/plugins";
 import { BETTER_AUTH_URL } from "@/constants/env";
 import { db } from "@/lib/database";
 
@@ -16,5 +16,7 @@ export const auth = betterAuth({
   plugins: [ 
         username(),
         openAPI(),
+        admin({defaultRole: 'user'}),
+        organization(),
     ] 
 });
