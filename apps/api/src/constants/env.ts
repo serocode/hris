@@ -6,6 +6,10 @@ export const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL || 'https://api.hris.
 export const LOG_LEVEL = process.env.LOG_LEVEL || 'debug';
 export const NODE_ENV = process.env.NODE_ENV || 'development';
 
+export const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim())
+  : ['http://localhost:5173', 'http://localhost:3000'];
+
 // Redis Configuration
 export const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
 export const REDIS_PORT = process.env.REDIS_PORT

@@ -9,22 +9,25 @@ import {
   UnauthorizedErrorRoute,
 } from '@hris-v2/api-routes';
 import {
-  EmployeesCreatePayload,
-  EmployeesCreateResponse,
+  EmployeesUpdateParams,
+  EmployeesUpdatePayload,
+  EmployeesUpdateResponse,
 } from '@hris-v2/api-routes/employees';
 import { employeeService } from '@/services/employees';
 import type { App } from '@/types/index';
+import { formatDate } from '@/utils/common';
 
 const route = createRoute({
   tags: ['employees'],
-  summary: 'Create an employee',
-  method: 'post',
-  path: '/',
+  summary: 'Update an employee',
+  method: 'patch',
+  path: '/{id}',
   request: {
+    params: EmployeesUpdateParams,
     body: {
       content: {
         'application/json': {
-          schema: EmployeesCreatePayload,
+          schema: EmployeesUpdatePayload,
         },
       },
     },
@@ -35,13 +38,13 @@ const route = createRoute({
     },
   ],
   responses: {
-    201: {
+    200: {
       content: {
         'application/json': {
-          schema: EmployeesCreateResponse,
+          schema: EmployeesUpdateResponse,
         },
       },
-      description: 'Employee created successfully',
+      description: 'Employee updated successfully',
     },
     ...BadRequestErrorRoute,
     ...UnauthorizedErrorRoute,
@@ -51,8 +54,9 @@ const route = createRoute({
   },
 });
 
-export function createEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
+export function updateEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
   employeeRoute.openapi(route, async (c) => {
+    const { id } = c.req.valid('param');
     const body = c.req.valid('json');
     const user = c.get('user');
     const logger = c.get('logger');
@@ -61,19 +65,20 @@ export function createEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
       {
         userId: user.id,
         userEmail: user.email,
-        employeeNumber: body.employeeNumber,
+        employeeId: id,
+        updates: body,
       },
-      'Creating employee',
+      'Updating employee',
     );
 
-    const result = await employeeService.create(body, user.id);
+    const result = await employeeService.update(id, body);
 
     logger.info(
       {
         employeeId: result.data.id,
-        employeeNumber: body.employeeNumber,
+        employeeNumber: result.data.employeeNumber,
       },
-      'Employee created successfully',
+      'Employee updated successfully',
     );
 
     return c.json(
@@ -84,9 +89,14 @@ export function createEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
         firstName: result.data.firstName,
         lastName: result.data.lastName,
         position: result.data.position,
-        hireDate: result.data.hireDate,
+        hireDate: formatDate(result.data.hireDate),
+        createdAt: result.data.createdAt
+          ? formatDate(result.data.createdAt, 'YYYY-MM-DDTHH:mm:ssZ')
+          : '',
+        updatedAt: result.data.updatedAt
+          ? formatDate(result.data.updatedAt, 'YYYY-MM-DDTHH:mm:ssZ')
+          : '',
       }),
-      201,
     );
   });
 }

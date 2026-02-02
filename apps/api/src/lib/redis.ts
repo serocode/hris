@@ -14,9 +14,9 @@ export const connection = {
   port: REDIS_PORT,
   host: REDIS_HOST,
   db: REDIS_DB,
-  // Only include username if it's not empty
+  
   ...(REDIS_USERNAME && { username: REDIS_USERNAME }),
-  // Only include password if it's not empty
+  
   ...(REDIS_PASSWORD && { password: REDIS_PASSWORD }),
   retryStrategy(times: number) {
     const delay = Math.min(times * 50, 2000);
@@ -35,8 +35,5 @@ redisClient.on('error', (err) => {
   logger.error({ error: err.message }, '❌ Redis connection error');
 });
 
-redisClient.on('ready', () => {
-  logger.info('✅ Redis is ready to accept commands');
-});
 
 export default redisClient;

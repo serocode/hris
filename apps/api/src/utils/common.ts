@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 
 /**
  * Runs a promise and returns a tuple of the result and error.
@@ -11,6 +13,9 @@ export function runAwait<T, U = Error>(
     .catch<[null, U]>((err) => [null, err]);
 }
 
-export function formatDate(date: Date, format = 'YYYY-MM-DD') {
-  return dayjs(date).format(format);
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+export function formatDate(date: Date | string, format = 'YYYY-MM-DD', tz = 'Asia/Manila') {
+  return dayjs(date).tz(tz).format(format);
 }
