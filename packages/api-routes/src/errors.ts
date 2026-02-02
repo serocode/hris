@@ -117,11 +117,3 @@ export const ServerErrorRoute = createErrorRoute(
 	ServerErrorSchema,
 	"Internal server error",
 )
-
-export const CommonErrorResponses = {
-	...BadRequestErrorRoute,
-	...UnauthorizedErrorRoute,
-	...NotFoundErrorRoute,
-	...ConflictErrorRoute,
-	...ServerErrorRoute,
-} as const

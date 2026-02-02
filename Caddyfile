@@ -7,3 +7,8 @@ hris.localhost {
 	tls internal
 	reverse_proxy localhost:5173
 }
+
+mail.hris.localhost {
+	tls internal
+	reverse_proxy localhost:8025
+}

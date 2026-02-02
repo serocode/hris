@@ -1,1 +1,5 @@
 export * from "./employees.create"
+export * from "./employees.delete"
+export * from "./employees.details"
+export * from "./employees.list"
+export * from "./employees.update"

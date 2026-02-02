@@ -3,15 +3,18 @@ import { Scalar } from '@scalar/hono-api-reference';
 import { Queue } from 'bullmq';
 import close from 'close-with-grace';
 import { cors } from 'hono/cors';
-import { API_PORT } from '@/constants/env';
+import { ALLOWED_ORIGINS, API_PORT } from '@/constants/env';
 import { MAIL_QUEUE } from '@/constants/queue';
 import { auth } from '@/lib/auth';
 import { db, pg } from '@/lib/database';
 import { createHonoApp } from '@/lib/hono';
-import { connection } from '@/lib/redis';
+import { connection, redisClient } from '@/lib/redis';
+import { contentTypeValidator } from '@/middlewares/content-type';
+import { healthCheck, livenessProbe, readinessProbe } from '@/middlewares/health';
 import { getLogger, loggerMiddleware } from '@/middlewares/logger';
 import { notFound } from '@/middlewares/not-found';
 import { onError } from '@/middlewares/on-error';
+import { requestSizeLimit } from '@/middlewares/request-size';
 import type { App } from '@/types';
 import { services } from '@/utils/service';
 import { v1Routes } from '@/v1';
@@ -32,10 +35,16 @@ async function init() {
 
   openAPIHono.use(
     cors({
-      origin: ['http://localhost:5173', 'http://localhost:3000'], 
+      origin: ALLOWED_ORIGINS,
       credentials: true,
     }),
   );
+
+  // Content-Type validation for POST/PUT/PATCH requests
+  openAPIHono.use(contentTypeValidator());
+
+  // Request size limit (10MB max)
+  openAPIHono.use(requestSizeLimit());
 
   openAPIHono.notFound(notFound);
   openAPIHono.onError(onError);
@@ -48,10 +57,13 @@ async function init() {
     bearerFormat: 'JWT',
   });
 
-  // Health check
+  // Health check endpoints
   openAPIHono.get('/', (c) => {
     return c.json({ status: 'ok', message: 'HRIS API is running' });
   });
+  openAPIHono.get('/health', healthCheck());
+  openAPIHono.get('/health/live', livenessProbe());
+  openAPIHono.get('/health/ready', readinessProbe());
 
   // OpenAPI documentation
   openAPIHono.doc('/openapi-doc', (c) => {
@@ -90,7 +102,7 @@ async function init() {
 
   // App context
   const app: App = {
-     openAPIHono,
+    openAPIHono,
     pg,
     db,
     mailQueue,
@@ -109,6 +121,14 @@ async function init() {
     }
     
     await svcs.shutdown();
+    
+    // Close Redis connection
+    try {
+      await redisClient.quit();
+      logger.info('Redis connection closed gracefully');
+    } catch (error) {
+      logger.error({ error }, 'Failed to close Redis connection');
+    }
     
     logger.info(
       `Server stopped with SIGNAL ${signal}. Manual: ${!!manual}`,
@@ -133,11 +153,17 @@ async function init() {
         },
       });
 
+      // Register Redis
+      svcs.add({
+        name: 'redis',
+        shutdown: async () => {
+          await redisClient.quit();
+        },
+      });
+
       logger.info(
         `🚀 Server is running on http://${info.address}:${info.port}`,
       );
-      logger.info(`📚 API Documentation: http://localhost:${info.port}/docs`);
-      logger.info(`📄 OpenAPI Spec: http://localhost:${info.port}/openapi-doc`);
     },
   );
 }

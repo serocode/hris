@@ -30,6 +30,8 @@ export const employees = pgTable(
   (table) => [index("employees_userId_idx").on(table.userId)],
 )
 
+export type EmployeeRecord = typeof employees.$inferSelect;
+
 export const employeeRelations = relations(employees, ({ one }) => ({
   user: one(user, {
     fields: [employees.userId],
