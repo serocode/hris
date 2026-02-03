@@ -33,7 +33,6 @@ const route = createRoute({
     {
       Bearer: [],
     },
-    
   ],
   responses: {
     201: {
@@ -58,7 +57,7 @@ export function createEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
     const user = c.get('user');
     const logger = c.get('logger');
 
-    logger.info(
+    logger.debug(
       {
         userId: user.id,
         userEmail: user.email,
@@ -69,7 +68,7 @@ export function createEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
 
     const result = await employeeService.create(body, user.id);
 
-    logger.info(
+    logger.debug(
       {
         employeeId: result.data.id,
         employeeNumber: body.employeeNumber,

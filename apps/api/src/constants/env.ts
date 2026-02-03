@@ -1,10 +1,5 @@
 import { z } from "zod"
 
-/**
- * Environment variable validation schema using Zod.
- * Validates all required environment variables at startup and fails fast
- * with clear error messages if any are missing or invalid.
- */
 const envSchema = z.object({
 	// Server Configuration
 	API_PORT: z.coerce.number().default(3333),
@@ -28,6 +23,8 @@ const envSchema = z.object({
 	POSTGRES_USER: z.string().min(1, "POSTGRES_USER is required"),
 	POSTGRES_PASSWORD: z.string().min(1, "POSTGRES_PASSWORD is required"),
 	POSTGRES_DB: z.string().min(1, "POSTGRES_DB is required"),
+	POSTGRES_MAX_CONNECTIONS: z.coerce.number().default(10),
+	POSTGRES_IDLE_TIMEOUT: z.coerce.number().default(30),
 
 	// Redis Configuration
 	REDIS_HOST: z.string().default("localhost"),
@@ -50,10 +47,6 @@ if (!parsed.success) {
 	process.exit(1)
 }
 
-/**
- * Validated environment configuration.
- * All values are type-safe and validated at startup.
- */
 export const env = parsed.data
 
 // Re-export individual variables for backward compatibility
@@ -67,6 +60,8 @@ export const POSTGRES_HOST = env.POSTGRES_HOST
 export const POSTGRES_USER = env.POSTGRES_USER
 export const POSTGRES_PASSWORD = env.POSTGRES_PASSWORD
 export const POSTGRES_DB = env.POSTGRES_DB
+export const POSTGRES_MAX_CONNECTIONS = env.POSTGRES_MAX_CONNECTIONS
+export const POSTGRES_IDLE_TIMEOUT = env.POSTGRES_IDLE_TIMEOUT
 export const REDIS_HOST = env.REDIS_HOST
 export const REDIS_PORT = env.REDIS_PORT
 export const REDIS_PASSWORD = env.REDIS_PASSWORD

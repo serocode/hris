@@ -1,5 +1,5 @@
 import { createHonoApp } from '@/lib/hono';
-import { sessionCheck } from '@/middlewares/auth';
+import { sessionCheck } from '@/middlewares/session';
 import type { App } from '@/types';
 import { createEmployeeRoute } from './create';
 import { deleteEmployeeRoute } from './delete';

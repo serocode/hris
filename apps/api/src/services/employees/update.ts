@@ -1,16 +1,11 @@
+import type { EmployeesUpdatePayload } from '@hris-v2/api-routes/employees';
 import { ServiceError } from '@/lib/service-error';
 import { employeeRepository } from '@/repositories/employees';
 import { formatDate } from '@/utils/common';
 
 export const update = async (
   id: string,
-  payload: Partial<{
-    employeeNumber: string;
-    firstName: string;
-    lastName: string;
-    position: string;
-    hireDate: Date | string;
-  }>,
+  payload: EmployeesUpdatePayload,
 ) => {
   try {
     const { hireDate, employeeNumber, ...rest } = payload;

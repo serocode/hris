@@ -14,6 +14,7 @@ import { healthCheck, livenessProbe, readinessProbe } from '@/middlewares/health
 import { getLogger, loggerMiddleware } from '@/middlewares/logger';
 import { notFound } from '@/middlewares/not-found';
 import { onError } from '@/middlewares/on-error';
+import { rateLimit } from '@/middlewares/rate-limiter';
 import { requestSizeLimit } from '@/middlewares/request-size';
 import type { App } from '@/types';
 import { services } from '@/utils/service';
@@ -113,6 +114,13 @@ async function init() {
   openAPIHono.on(['POST', 'GET'], '/api/auth/*', (c) => auth.handler(c.req.raw));
 
   // API routes
+  openAPIHono.use(
+    '/api/*',
+    rateLimit({
+      windowMs: 60 * 1000, // 1 minute
+      max: 100, // 100 requests per minute
+    }),
+  );
   openAPIHono.route('/api/v1', v1Routes(app));
 
   // Graceful shutdown

@@ -47,7 +47,7 @@ export function listEmployeesRoute(_app: App, employeeRoute: OpenAPIHono) {
     const user = c.get('user');
     const logger = c.get('logger');
 
-    logger.info(
+    logger.debug(
       {
         userId: user.id,
         userEmail: user.email,
@@ -57,18 +57,19 @@ export function listEmployeesRoute(_app: App, employeeRoute: OpenAPIHono) {
       'Listing employees',
     );
 
-    const employees = await employeeService.list(limit, offset);
+    const { data: employees, total } = await employeeService.list(limit, offset);
 
-    logger.info(
+    logger.debug(
       {
         count: employees.length,
+        total,
         limit,
         offset,
       },
       'Employees retrieved successfully',
     );
 
-    const data = employees.map((employee) => ({
+    const mappedData = employees.map((employee) => ({
       id: employee.id,
       userId: employee.userId,
       employeeNumber: employee.employeeNumber,
@@ -87,13 +88,13 @@ export function listEmployeesRoute(_app: App, employeeRoute: OpenAPIHono) {
     const meta = {
       limit,
       offset,
-      total: employees.length,
+      total,
     };
 
     return c.json(
       {
         status: 'success' as const,
-        data,
+        data: mappedData,
         meta,
       },
       200,

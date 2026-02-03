@@ -3,6 +3,8 @@ import postgres from 'postgres';
 import {
     POSTGRES_DB,
     POSTGRES_HOST,
+    POSTGRES_IDLE_TIMEOUT,
+    POSTGRES_MAX_CONNECTIONS,
     POSTGRES_PASSWORD,
     POSTGRES_USER,
 } from '@/constants/env';
@@ -15,6 +17,8 @@ export const pg = postgres({
   database: POSTGRES_DB,
   user: POSTGRES_USER,
   password: POSTGRES_PASSWORD,
+  max: POSTGRES_MAX_CONNECTIONS,
+  idle_timeout: POSTGRES_IDLE_TIMEOUT,
 });
 
 export const db = drizzle(pg, { logger: true, schema});
