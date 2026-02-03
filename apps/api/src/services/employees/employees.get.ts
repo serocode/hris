@@ -1,8 +1,8 @@
 import { ServiceError } from '@/lib/service-error';
 import { employeeRepository } from '@/repositories/employees';
 
-export const getById = async (id: string) => {
-  const employee = await employeeRepository.getById(id);
+export const getEmployeeById = async (id: string) => {
+  const employee = await employeeRepository.getEmployeeById(id);
   if (!employee) {
     throw new ServiceError(
       'EMPLOYEE_NOT_FOUND',
@@ -13,8 +13,8 @@ export const getById = async (id: string) => {
   return employee;
 };
 
-export const getByEmployeeNumber = async (employeeNumber: string) => {
-  const employee = await employeeRepository.getByEmployeeNumber(employeeNumber);
+export const getEmployeeByEmployeeNumber = async (employeeNumber: string) => {
+  const employee = await employeeRepository.getEmployeeByEmployeeNumber(employeeNumber);
   if (!employee) {
     throw new ServiceError(
       'EMPLOYEE_NOT_FOUND',
@@ -25,8 +25,8 @@ export const getByEmployeeNumber = async (employeeNumber: string) => {
   return employee;
 };
 
-export const getByUserId = async (userId: string) => {
-  const employee = await employeeRepository.getByUserId(userId);
+export const getEmployeeByUserId = async (userId: string) => {
+  const employee = await employeeRepository.getEmployeeByUserId(userId);
   if (!employee) {
     throw new ServiceError(
       'EMPLOYEE_NOT_FOUND',

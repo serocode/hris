@@ -59,7 +59,7 @@ export function getEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
       'Getting employee by ID',
     );
 
-    const employee = await employeeService.getById(id);
+    const employee = await employeeService.getEmployeeById(id);
 
     logger.info(
       {

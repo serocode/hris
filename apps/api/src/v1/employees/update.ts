@@ -71,7 +71,7 @@ export function updateEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
       'Updating employee',
     );
 
-    const result = await employeeService.update(id, body);
+    const result = await employeeService.updateEmployee(id, body);
 
     logger.info(
       {

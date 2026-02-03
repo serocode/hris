@@ -2,7 +2,7 @@ import { count } from 'drizzle-orm';
 import { db } from '@/lib/database';
 import { type EmployeeRecord, employees } from '@/schema/employees';
 
-export const list = async (
+export const listEmployees = async (
   limit = 100,
   offset = 0,
 ): Promise<{ data: EmployeeRecord[]; total: number }> => {

@@ -1,135 +1,159 @@
-# Turborepo starter
+# HRIS-v2 Developer Onboarding Guide
 
-This Turborepo starter is maintained by the Turborepo core team.
+Welcome to the HRIS-v2 project! This document serves as a comprehensive guide to help you get started with development.
 
-## Using this example
+---
 
-Run the following command:
+## 🚀 Project Overview
 
-```sh
-npx create-turbo@latest
+**HRIS-v2** (Human Resource Information System) is a modern, high-performance backend solution designed to manage employee data, authentication, and background organizational tasks. It is built as a **Turborepo monorepo**, ensuring a clean separation between API contracts, server logic, and shared utilities.
+
+---
+
+## 🛠 Tech Stack
+
+- **Monorepo**: [Turborepo](https://turbo.build/) & [pnpm](https://pnpm.io/)
+- **Web Framework**: [Hono](https://hono.dev/) with `zod-openapi` for type-safe contracts
+- **Database**: [PostgreSQL](https://www.postgresql.org/) with [Drizzle ORM](https://orm.drizzle.team/)
+- **Authentication**: [BetterAuth](https://www.better-auth.com/)
+- **Queue/Cache**: [Redis](https://redis.io/) & [BullMQ](https://docs.bullmq.io/)
+- **Logging**: [Pino](https://getpino.io/)
+- **Testing**: [Vitest](https://vitest.dev/)
+- **Linting/Formatting**: [Biome](https://biomejs.dev/)
+- **Local Proxy**: [Caddy](https://caddyserver.com/)
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1. Prerequisites
+Ensure you have the following installed:
+- Node.js (>= 18)
+- pnpm
+- Docker & Docker Compose
+- Caddy
+
+### 2. Installation
+Clone the repository and install dependencies:
+```bash
+pnpm install
 ```
 
-## What's inside?
-
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+### 3. Environment Variables
+Copy the example environment file and fill in required values:
+```bash
+cp .env.example .env
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+### 4. Initialization
+Run the setup command to start databases and check dependencies:
+```bash
+make setup
 ```
 
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+### 5. Database Migrations
+Generate and run migrations to set up your schema:
+```bash
+make migrate
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
+### 6. Run Locally
+Start the development environment (Caddy and Server):
+```bash
+make dev
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+The API should now be accessible at `https://api.hris.localhost`.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+---
 
-### Remote Caching
+## 📂 Project Structure
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+```text
+├── apps
+│   ├── api             # Main Hono backend service
+│   │   ├── src/v1      # API Version 1 endpoints
+│   │   ├── src/lib     # Core infrastructure (Auth, DB, Redis)
+│   │   ├── src/services# Business logic layer
+│   │   └── src/repos   # Data access layer (Drizzle queries)
+│   └── ui              # Frontend application (React/Next.js)
+├── packages
+│   └── api-routes      # Shared Zod schemas and API contracts
+├── .devcontainer       # Docker Compose configs
+└── Makefile            # Task automation
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+---
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+## 📜 Makefile Commands
 
+Use `make <command>` for common tasks:
+
+| Command | Description |
+|---------|-------------|
+| `setup` | Runs dependency checks and starts Docker containers |
+| `dev` | Runs all apps in development mode with Caddy |
+| `stop` | Stops all running Docker containers |
+| `migrate` | Generates and applies Drizzle migrations |
+| `studio` | Launches Drizzle Kit Studio to view DB data |
+| `api-docs` | Opens the local Swagger UI Documentation |
+| `seed` | Feeds the database with initial development data |
+
+---
+
+## 🛣 How to Create a New Feature (API Route)
+
+We follow a strict **Contract-First** and **Layered Architecture** approach.
+
+### 1. Define the Contract (Shared Package)
+Define your Zod schemas in `packages/api-routes/src/[module]/[feature].ts`. This ensures both frontend and backend use the same types.
+```typescript
+export const CreateFeatureSchema = z.object({ name: z.string() });
+export const FeatureResponse = z.object({ status: z.literal("success"), data: z.object({ id: z.string() }) });
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+### 2. Implement the Repository (Data Access)
+Create a new file in `apps/api/src/repositories/[module]/[module].[feature].ts`. Use Drizzle ORM for database queries.
+```typescript
+export const createItem = async (data: NewItem) => {
+  return db.insert(items).values(data).returning();
+};
+```
+*Barrel export your actions in `repositories/[module]/index.ts`.*
+
+### 3. Implement the Service (Business Logic)
+Create a new file in `apps/api/src/services/[module]/[module].[feature].ts`. This layer handles orchestration, external calls, and domain-specific errors.
+```typescript
+export const createItem = async (payload: Payload) => {
+  // Logic, validation, worker triggers, etc.
+  const result = await itemRepository.createItem(payload);
+  return { success: true, data: result };
+};
+```
+*Barrel export your services in `services/[module]/index.ts`.*
+
+### 4. Create the API Route (Controller)
+In `apps/api/src/v1/[module]/[action].ts`, implement the Hono/OpenAPI route:
+```typescript
+export function createItemRoute(app: App, router: OpenAPIHono) {
+  router.openapi(routeSpec, async (c) => {
+    const body = c.req.valid('json');
+    const result = await itemService.createItem(body);
+    return c.json({ status: "success", data: result.data }, 201);
+  });
+}
 ```
 
-## Useful Links
+### 5. Register the Route
+Add the route handler to the module's route index (`src/v1/[module]/index.ts`) and ensure the module is registered in the main `src/v1/index.ts`.
 
-Learn more about the power of Turborepo:
+---
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+## ⚖️ Best Practices & Conventions
+
+- **Fail Fast**: All environment variables are validated via Zod in `src/constants/env.ts` at startup.
+- **Layered Architecture**: Keep HTTP logic in **Routes**, orchestration in **Services**, and raw DB queries in **Repositories**.
+- **Type Safety**: Never use `any`. Rely on Zod schema inference for request/response types.
+- **Graceful Shutdown**: All infrastructure services (Redis, PG, Workers) must be registered in the service registry for orderly cleanup.
+- **Logging**: Use `logger.info` for major events and `logger.debug` for detailed request/flow data.
+
+

@@ -60,7 +60,7 @@ export function getEmployeeByNumberRoute(_app: App, employeeRoute: OpenAPIHono) 
       'Getting employee by employee number',
     );
 
-    const employee = await employeeService.getByEmployeeNumber(employeeNumber);
+    const employee = await employeeService.getEmployeeByEmployeeNumber(employeeNumber);
 
     logger.info(
       {

@@ -1,25 +1,30 @@
+import { eq } from 'drizzle-orm';
 import postgres from 'postgres';
 import { POSTGRES_ERR } from '@/constants/common';
 import { db } from '@/lib/database';
 import { ServiceError } from '@/lib/service-error';
-import { employees } from '@/schema/employees';
+import { type EmployeeRecord, employees } from '@/schema/employees';
 
-export const create = async (data: {
-  id: string;
-  userId: string;
-  employeeNumber: string;
-  firstName: string;
-  lastName: string;
-  position: string;
-  hireDate: string;
-}) => {
+export const updateEmployee = async (
+  id: string,
+  data: Partial<Omit<EmployeeRecord, 'id' | 'createdAt' | 'updatedAt'>>,
+): Promise<EmployeeRecord> => {
   try {
-    const [created] = await db
-      .insert(employees)
-      .values(data)
+    const [updated] = await db
+      .update(employees)
+      .set(data)
+      .where(eq(employees.id, id))
       .returning();
 
-    return created;
+    if (!updated) {
+      throw new ServiceError(
+        'EMPLOYEE_NOT_FOUND',
+        'Employee not found',
+        404,
+      );
+    }
+
+    return updated;
   } catch (err) {
     const pgError =
       (err && typeof err === 'object' && 'cause' in err && err.cause instanceof postgres.PostgresError)
@@ -33,7 +38,7 @@ export const create = async (data: {
         case POSTGRES_ERR.employees_employeeNumber_unique:
           throw new ServiceError(
             'EMPLOYEE_NUMBER_EXISTS',
-            `Employee number ${data.employeeNumber} already exists`,
+            `Employee number already exists`,
             400,
           );
         case POSTGRES_ERR.employees_userId_unique:

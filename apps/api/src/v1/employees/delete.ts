@@ -58,7 +58,7 @@ export function deleteEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
       'Deleting employee',
     );
 
-    const result = await employeeService.delete(id);
+    const result = await employeeService.deleteEmployee(id);
 
     logger.info(
       {

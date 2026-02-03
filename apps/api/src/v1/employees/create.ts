@@ -66,7 +66,7 @@ export function createEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
       'Creating employee',
     );
 
-    const result = await employeeService.create(body, user.id);
+    const result = await employeeService.createEmployee(body, user.id);
 
     logger.debug(
       {

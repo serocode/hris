@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/lib/database';
 import { type EmployeeRecord, employees } from '@/schema/employees';
 
-export const getById = async (id: string): Promise<EmployeeRecord | null> => {
+export const getEmployeeById = async (id: string): Promise<EmployeeRecord | null> => {
   const [employee] = await db
     .select()
     .from(employees)
@@ -12,7 +12,7 @@ export const getById = async (id: string): Promise<EmployeeRecord | null> => {
   return employee || null;
 };
 
-export const getByEmployeeNumber = async (employeeNumber: string): Promise<EmployeeRecord | null> => {
+export const getEmployeeByEmployeeNumber = async (employeeNumber: string): Promise<EmployeeRecord | null> => {
   const [employee] = await db
     .select()
     .from(employees)
@@ -22,7 +22,7 @@ export const getByEmployeeNumber = async (employeeNumber: string): Promise<Emplo
   return employee || null;
 };
 
-export const getByUserId = async (userId: string): Promise<EmployeeRecord | null> => {
+export const getEmployeeByUserId = async (userId: string): Promise<EmployeeRecord | null> => {
   const [employee] = await db
     .select()
     .from(employees)

@@ -1,26 +1,30 @@
 export type { EmployeeRecord } from '@/schema/employees';
-export { create } from './create';
-export { delete_ } from './delete';
+export { createEmployee } from './employees.create';
+export { deleteEmployee } from './employees.delete';
 export {
-  getByEmployeeNumber,
-  getById,
-  getByUserId,
-} from './get';
-export { list } from './list';
-export { update } from './update';
+  getEmployeeByEmployeeNumber,
+  getEmployeeById,
+  getEmployeeByUserId,
+} from './employees.get';
+export { listEmployees } from './employees.list';
+export { updateEmployee } from './employees.update';
 
-import { create } from './create';
-import { delete_ } from './delete';
-import { getByEmployeeNumber, getById, getByUserId } from './get';
-import { list } from './list';
-import { update } from './update';
+import { createEmployee } from './employees.create';
+import { deleteEmployee } from './employees.delete';
+import {
+  getEmployeeByEmployeeNumber,
+  getEmployeeById,
+  getEmployeeByUserId,
+} from './employees.get';
+import { listEmployees } from './employees.list';
+import { updateEmployee } from './employees.update';
 
 export const employeeRepository = {
-  create,
-  getById,
-  getByEmployeeNumber,
-  getByUserId,
-  list,
-  update,
-  delete: delete_,
+  createEmployee,
+  getEmployeeById,
+  getEmployeeByEmployeeNumber,
+  getEmployeeByUserId,
+  listEmployees,
+  updateEmployee,
+  deleteEmployee,
 };

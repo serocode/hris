@@ -57,7 +57,7 @@ export function listEmployeesRoute(_app: App, employeeRoute: OpenAPIHono) {
       'Listing employees',
     );
 
-    const { data: employees, total } = await employeeService.list(limit, offset);
+    const { data: employees, total } = await employeeService.listEmployees(limit, offset);
 
     logger.debug(
       {

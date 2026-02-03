@@ -3,12 +3,12 @@ import { ServiceError } from '@/lib/service-error';
 import { employeeRepository } from '@/repositories/employees';
 import { formatDate } from '@/utils/common';
 
-export const create = async (
+export const createEmployee = async (
   payload: EmployeesCreatePayload,
   authenticatedUserId: string,
 ) => {
   try {
-    const employee = await employeeRepository.create({
+    const employee = await employeeRepository.createEmployee({
       id: crypto.randomUUID(),
       userId: payload.userId || authenticatedUserId,
       employeeNumber: payload.employeeNumber,

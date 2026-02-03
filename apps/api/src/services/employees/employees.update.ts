@@ -3,7 +3,7 @@ import { ServiceError } from '@/lib/service-error';
 import { employeeRepository } from '@/repositories/employees';
 import { formatDate } from '@/utils/common';
 
-export const update = async (
+export const updateEmployee = async (
   id: string,
   payload: EmployeesUpdatePayload,
 ) => {
@@ -11,7 +11,7 @@ export const update = async (
     const { hireDate, employeeNumber, ...rest } = payload;
 
     if (employeeNumber) {
-      const existingEmployee = await employeeRepository.getByEmployeeNumber(employeeNumber);
+      const existingEmployee = await employeeRepository.getEmployeeByEmployeeNumber(employeeNumber);
       if (existingEmployee && existingEmployee.id !== id) {
         throw new ServiceError(
           'EMPLOYEE_NUMBER_EXISTS',
@@ -33,7 +33,7 @@ export const update = async (
       ...(hireDate !== undefined && { hireDate: formatDate(hireDate) }),
     };
 
-    const updated = await employeeRepository.update(id, updateData);
+    const updated = await employeeRepository.updateEmployee(id, updateData);
 
     return {
       success: true,
