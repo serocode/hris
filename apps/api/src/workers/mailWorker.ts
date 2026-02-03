@@ -1,78 +1,116 @@
-import { QueueEvents } from 'bullmq';
-// import nodemailer from 'nodemailer';
-// import { NODE_ENV, SMTP_HOST, SMTP_PORT } from '@/constants/env';
-import { MAIL_QUEUE } from '@/constants/queue';
-import { connection } from '@/lib/redis';
-import { getLogger } from '@/middlewares/logger';
+import { QueueEvents, Worker } from "bullmq"
+import nodemailer from "nodemailer"
+import { NODE_ENV, SMTP_HOST, SMTP_PORT } from "@/constants/env"
+import { MAIL_QUEUE } from "@/constants/queue"
+import { connection } from "@/lib/redis"
+import { getLogger } from "@/middlewares/logger"
 
-const logger = getLogger();
+const logger = getLogger()
+
+/**
+ * Mail job data structure for BullMQ
+ */
+export type MailJobData = {
+	to: string
+	subject: string
+	text?: string
+	html?: string
+	from?: string
+}
+
+/**
+ * Queue events for monitoring mail queue status
+ */
 const queueEvents = new QueueEvents(MAIL_QUEUE, {
-  connection,
-});
+	connection,
+})
 
-queueEvents.on('failed', ({ jobId, failedReason }) => {
-  logger.error(`${jobId} has failed with reason ${failedReason}`);
-});
+queueEvents.on("failed", ({ jobId, failedReason }) => {
+	logger.error(`Mail job ${jobId} failed: ${failedReason}`)
+})
 
-// type DataType = {
-//   email: string;
-//   firstName: string;
-//   lastName: string;
-//   mailType: 'magicLink';
-//   token: string;
-//   timeout: number;
-// };
+queueEvents.on("completed", ({ jobId }) => {
+	logger.info(`Mail job ${jobId} completed successfully`)
+})
 
-// let transporter: ReturnType<typeof nodemailer.createTransport>;
+/**
+ * Nodemailer transporter configuration
+ * Uses secure connection in production, plain in development
+ */
+const transporter = nodemailer.createTransport({
+	host: SMTP_HOST,
+	port: SMTP_PORT,
+	secure: NODE_ENV === "production",
+})
 
-// if (NODE_ENV === 'production') {
-//   transporter = nodemailer.createTransport({
-//     host: SMTP_HOST,
-//     port: SMTP_PORT,
-//   });
-// } else {
-//   transporter = nodemailer.createTransport({
-//     port: SMTP_PORT,
-//     secure: false,
-//   });
-// }
+/**
+ * Mail worker that processes email jobs from the queue.
+ * Handles sending emails via nodemailer with proper logging and error handling.
+ */
+export const mailWorker = new Worker<MailJobData>(
+	MAIL_QUEUE,
+	async (job) => {
+		const { to, subject, text, html, from } = job.data
 
-// TODO: Move as a another package
-// export const mailWorker = new Worker<DataType>(
-//   MAIL_QUEUE,
-//   async (job) => {
-//     const controller = new AbortController();
-//     const timer = setTimeout(() => controller.abort(), job.data.timeout);
-//     const { mailType } = job.data;
+		logger.info(
+			{ jobId: job.id, to, subject },
+			"Processing mail job",
+		)
 
-//     if (mailType === 'magicLink') {
-//       logger.info(`Sending email to: ${job.data.email}`);
-//       try {
-//         return await transporter.sendMail({
-//           from: 'hello@hris.com',
-//           to: job.data.email,
-//           subject: 'Login to hris',
-//           // TODO: UPdate URL
-//           text: `Please click this link to login url: http://localhost:5173/magic-link?token=${job.data.token}`,
-//         });
-//       } catch (err) {
-//         if (err instanceof Error && err.name === 'AbortError') {
-//           throw new Error('Timeout');
-//         } else {
-//           throw err;
-//         }
-//       } finally {
-//         clearTimeout(timer);
-//       }
-//     }
+		try {
+			const result = await transporter.sendMail({
+				from: from || "noreply@hris.localhost",
+				to,
+				subject,
+				text,
+				html,
+			})
 
-//     throw new Error('No matching mail type');
-//   },
-//   {
-//     connection,
-//   },
-// );
+			logger.info(
+				{ jobId: job.id, messageId: result.messageId },
+				"Mail sent successfully",
+			)
 
-// mailWorker.on('error', (error) => {
-//   logger.error(error);
-// });
+			return result
+		} catch (error) {
+			logger.error(
+				{
+					jobId: job.id,
+					error: error instanceof Error ? error.message : String(error),
+				},
+				"Failed to send mail",
+			)
+			throw error
+		}
+	},
+	{
+		connection,
+		concurrency: 5, // Process up to 5 emails concurrently
+	},
+)
+
+mailWorker.on("failed", (job, err) => {
+	logger.error(
+		{ jobId: job?.id, error: err.message, stack: err.stack },
+		"Mail worker job failed",
+	)
+})
+
+mailWorker.on("completed", (job) => {
+	logger.debug({ jobId: job.id }, "Mail worker job completed")
+})
+
+mailWorker.on("error", (error) => {
+	logger.error({ error: error.message }, "Mail worker error")
+})
+
+/**
+ * Gracefully shut down the mail worker.
+ * Waits for active jobs to complete before closing.
+ */
+export async function shutdownMailWorker(): Promise<void> {
+	logger.info("Shutting down mail worker...")
+	await mailWorker.close()
+	await queueEvents.close()
+	logger.info("Mail worker shut down complete")
+}

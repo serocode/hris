@@ -18,6 +18,7 @@ import { requestSizeLimit } from '@/middlewares/request-size';
 import type { App } from '@/types';
 import { services } from '@/utils/service';
 import { v1Routes } from '@/v1';
+import { shutdownMailWorker } from '@/workers';
 
 const logger = getLogger();
 const svcs = services();
@@ -159,6 +160,12 @@ async function init() {
         shutdown: async () => {
           await redisClient.quit();
         },
+      });
+
+      // Register Mail Worker
+      svcs.add({
+        name: 'mail-worker',
+        shutdown: shutdownMailWorker,
       });
 
       logger.info(

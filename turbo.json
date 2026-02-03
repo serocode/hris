@@ -1,21 +1,53 @@
 {
-  "$schema": "https://turborepo.com/schema.json",
-  "ui": "tui",
-  "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
-    },
-    "lint": {
-      "dependsOn": ["^lint"]
-    },
-    "check-types": {
-      "dependsOn": ["^check-types"]
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    }
-  }
+	"$schema": "https://turborepo.com/schema.json",
+	"ui": "tui",
+	"globalEnv": ["NODE_ENV", "API_PORT", "LOG_LEVEL"],
+	"tasks": {
+		"build": {
+			"dependsOn": ["^build"],
+			"outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+		},
+		"lint": {
+			"dependsOn": ["^lint"],
+			"outputs": []
+		},
+		"check-types": {
+			"dependsOn": ["^check-types"],
+			"outputs": []
+		},
+		"test": {
+			"dependsOn": ["^build"],
+			"outputs": ["coverage/**"]
+		},
+		"db:generate": {
+			"cache": false
+		},
+		"db:migrate": {
+			"cache": false
+		},
+		"dev": {
+			"cache": false,
+			"persistent": true,
+			"env": [
+				"BETTER_AUTH_SECRET",
+				"BETTER_AUTH_URL",
+				"POSTGRES_HOST",
+				"POSTGRES_PORT",
+				"POSTGRES_USER",
+				"POSTGRES_PASSWORD",
+				"POSTGRES_DB",
+				"REDIS_HOST",
+				"REDIS_PORT",
+				"REDIS_PASSWORD",
+				"REDIS_USERNAME",
+				"REDIS_DB",
+				"SMTP_HOST",
+				"SMTP_PORT",
+				"ALLOWED_ORIGINS"
+			]
+		},
+		"clean": {
+			"cache": false
+		}
+	}
 }

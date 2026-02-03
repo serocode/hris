@@ -33,6 +33,7 @@ const route = createRoute({
     {
       Bearer: [],
     },
+    
   ],
   responses: {
     201: {

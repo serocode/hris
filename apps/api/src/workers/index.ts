@@ -1,1 +1,1 @@
-export * from './mailWorker';
+export { type MailJobData, mailWorker, shutdownMailWorker } from "./mailWorker"

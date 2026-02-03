@@ -1,8 +1,8 @@
 import { createUnauthorizedResponse } from '@hris-v2/api-routes';
-import type { Context, Next } from 'hono';
+import { createMiddleware } from 'hono/factory';
 import { auth } from '@/lib/auth';
 
-export const sessionCheck = async (c: Context, next: Next) => {
+export const sessionCheck = createMiddleware(async (c, next) => {
   const logger = c.get('logger');
 
   try {
@@ -38,4 +38,4 @@ export const sessionCheck = async (c: Context, next: Next) => {
       401
     );
   }
-};
+});

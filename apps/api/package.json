@@ -25,11 +25,13 @@
     "@types/node": "^24.7.2",
     "@types/nodemailer": "^7.0.5",
     "@types/pg": "^8.16.0",
+    "@vitest/coverage-v8": "^3.1.4",
     "drizzle-kit": "^0.31.8",
     "rate-limit-redis": "^4.2.3",
     "stoker": "^2.0.1",
     "tsx": "^4.7.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.1.4"
   },
   "scripts": {
     "auth-docs": "open-cli http://api.hris.localhost/api/auth/reference",
@@ -41,7 +43,10 @@
     "kit:up": "drizzle-kit up",
     "migrate": "tsx src/migrate.ts",
     "start": "node dist/index.js",
-    "studio": "drizzle-kit studio --verbose"
+    "studio": "drizzle-kit studio --verbose",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest"
   },
   "type": "module"
 }
