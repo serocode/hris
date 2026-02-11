@@ -47,9 +47,9 @@ export const loggerMiddleware = createMiddleware(async (c, next) => {
 
   try {
     await next();
-
-    requestLogger.debug({
-      session: c.get('sessionId') || null,
+    logger.info({
+      method: c.req.method,
+      path: c.req.path,
       status: c.res.status,
       elapsed: `${Math.round(performance.now() - startTime)}ms`,
     }, 'Request completed');

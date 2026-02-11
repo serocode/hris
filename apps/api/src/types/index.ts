@@ -1,5 +1,4 @@
 import type { OpenAPIHono } from '@hono/zod-openapi';
-import type {Session, User} from 'better-auth'
 import type { Queue } from 'bullmq';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { Logger } from 'pino';
@@ -21,8 +20,8 @@ export type AuthType = {
 
 declare module 'hono' {
   interface ContextVariableMap {
-    user: User;
-    session: Session;
+    user: NonNullable<AuthType['user']>;
+    session: NonNullable<AuthType['session']>;
     logger: Logger;
   }
 }

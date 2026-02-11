@@ -11,7 +11,6 @@ export const createEmployee = async (
     const employee = await employeeRepository.createEmployee({
       id: crypto.randomUUID(),
       userId: payload.userId || authenticatedUserId,
-      employeeNumber: payload.employeeNumber,
       firstName: payload.firstName,
       lastName: payload.lastName,
       position: payload.position,

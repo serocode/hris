@@ -13,18 +13,6 @@ export const getEmployeeById = async (id: string) => {
   return employee;
 };
 
-export const getEmployeeByEmployeeNumber = async (employeeNumber: string) => {
-  const employee = await employeeRepository.getEmployeeByEmployeeNumber(employeeNumber);
-  if (!employee) {
-    throw new ServiceError(
-      'EMPLOYEE_NOT_FOUND',
-      `Employee with number ${employeeNumber} not found`,
-      404,
-    );
-  }
-  return employee;
-};
-
 export const getEmployeeByUserId = async (userId: string) => {
   const employee = await employeeRepository.getEmployeeByUserId(userId);
   if (!employee) {

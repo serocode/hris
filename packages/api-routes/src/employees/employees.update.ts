@@ -6,7 +6,6 @@ export const EmployeesUpdateParams = z.object({
 export type EmployeesUpdateParams = z.infer<typeof EmployeesUpdateParams>
 
 export const EmployeesUpdatePayload = z.object({
-	employeeNumber: z.string().min(7).optional().openapi({ example: "7865439" }),
 	firstName: z.string().min(2).optional().openapi({ example: "John" }),
 	lastName: z.string().min(2).optional().openapi({ example: "Doe" }),
 	position: z
@@ -21,7 +20,6 @@ export type EmployeesUpdatePayload = z.infer<typeof EmployeesUpdatePayload>
 const EmployeesUpdateResponseData = z.object({
 	id: z.string().openapi({ example: "adt819234masdf1m" }),
 	userId: z.string().openapi({ example: "adt819234masdf1m" }),
-	employeeNumber: z.string().openapi({ example: "7865439" }),
 	firstName: z.string().openapi({ example: "John" }),
 	lastName: z.string().openapi({ example: "Doe" }),
 	position: z.string().openapi({ example: "Senior Software Engineer" }),

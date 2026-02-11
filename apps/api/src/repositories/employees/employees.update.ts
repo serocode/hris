@@ -35,12 +35,6 @@ export const updateEmployee = async (
 
     if (pgError) {
       switch (pgError.constraint_name) {
-        case POSTGRES_ERR.employees_employeeNumber_unique:
-          throw new ServiceError(
-            'EMPLOYEE_NUMBER_EXISTS',
-            `Employee number already exists`,
-            400,
-          );
         case POSTGRES_ERR.employees_userId_unique:
           throw new ServiceError(
             'EMPLOYEE_EXISTS_FOR_USER',

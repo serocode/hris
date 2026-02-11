@@ -4,6 +4,7 @@ import {
   BadRequestErrorRoute,
   ConflictErrorRoute,
   createSuccessResponse,
+  ForbiddenErrorRoute,
   NotFoundErrorRoute,
   ServerErrorRoute,
   UnauthorizedErrorRoute,
@@ -13,6 +14,7 @@ import {
   EmployeesUpdatePayload,
   EmployeesUpdateResponse,
 } from '@hris-v2/api-routes/employees';
+import { requirePermission } from '@/middlewares/rbac';
 import { employeeService } from '@/services/employees';
 import type { App } from '@/types/index';
 import { formatDate } from '@/utils/common';
@@ -37,6 +39,7 @@ const route = createRoute({
       Bearer: [],
     },
   ],
+  middleware: [requirePermission({ user: ['set-role'] })],
   responses: {
     200: {
       content: {
@@ -48,13 +51,14 @@ const route = createRoute({
     },
     ...BadRequestErrorRoute,
     ...UnauthorizedErrorRoute,
+    ...ForbiddenErrorRoute,
     ...NotFoundErrorRoute,
     ...ConflictErrorRoute,
     ...ServerErrorRoute,
   },
 });
 
-export function updateEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
+export function updateEmployeeRoute(_app: App,employeeRoute: OpenAPIHono) {
   employeeRoute.openapi(route, async (c) => {
     const { id } = c.req.valid('param');
     const body = c.req.valid('json');
@@ -71,30 +75,28 @@ export function updateEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
       'Updating employee',
     );
 
-    const result = await employeeService.updateEmployee(id, body);
+    const employee = await employeeService.updateEmployee(id, body);
 
     logger.info(
       {
-        employeeId: result.data.id,
-        employeeNumber: result.data.employeeNumber,
+        employeeId: employee.data.id,
       },
       'Employee updated successfully',
     );
 
     return c.json(
       createSuccessResponse({
-        id: result.data.id,
-        userId: result.data.userId,
-        employeeNumber: result.data.employeeNumber,
-        firstName: result.data.firstName,
-        lastName: result.data.lastName,
-        position: result.data.position,
-        hireDate: formatDate(result.data.hireDate),
-        createdAt: result.data.createdAt
-          ? formatDate(result.data.createdAt, 'YYYY-MM-DDTHH:mm:ssZ')
+        id: employee.data.id,
+        userId: employee.data.userId,
+        firstName: employee.data.firstName,
+        lastName: employee.data.lastName,
+        position: employee.data.position,
+        hireDate: formatDate(employee.data.hireDate),
+        createdAt: employee.data.createdAt
+          ? formatDate(employee.data.createdAt, 'YYYY-MM-DDTHH:mm:ssZ')
           : '',
-        updatedAt: result.data.updatedAt
-          ? formatDate(result.data.updatedAt, 'YYYY-MM-DDTHH:mm:ssZ')
+        updatedAt: employee.data.updatedAt
+          ? formatDate(employee.data.updatedAt, 'YYYY-MM-DDTHH:mm:ssZ')
           : '',
       }),
     );

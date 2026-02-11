@@ -3,6 +3,7 @@ import { createRoute } from '@hono/zod-openapi';
 import {
   BadRequestErrorRoute,
   createSuccessResponse,
+  ForbiddenErrorRoute,
   NotFoundErrorRoute,
   ServerErrorRoute,
   UnauthorizedErrorRoute,
@@ -11,6 +12,7 @@ import {
   EmployeesDetailsParams,
   EmployeesDetailsResponse,
 } from '@hris-v2/api-routes/employees';
+import { requirePermission } from '@/middlewares/rbac';
 import { employeeService } from '@/services/employees';
 import type { App } from '@/types/index';
 import { formatDate } from '@/utils/common';
@@ -28,6 +30,7 @@ const route = createRoute({
       Bearer: [],
     },
   ],
+  middleware: [requirePermission({ user: ['list'] })],
   responses: {
     200: {
       content: {
@@ -39,12 +42,13 @@ const route = createRoute({
     },
     ...BadRequestErrorRoute,
     ...UnauthorizedErrorRoute,
+    ...ForbiddenErrorRoute,
     ...NotFoundErrorRoute,
     ...ServerErrorRoute,
   },
 });
 
-export function getEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
+export function getEmployeeRoute(_app: App,employeeRoute: OpenAPIHono) {
   employeeRoute.openapi(route, async (c) => {
     const { id } = c.req.valid('param');
     const user = c.get('user');
@@ -64,7 +68,6 @@ export function getEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
     logger.info(
       {
         employeeId: employee.id,
-        employeeNumber: employee.employeeNumber,
       },
       'Employee retrieved successfully',
     );
@@ -73,7 +76,6 @@ export function getEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
       createSuccessResponse({
         id: employee.id,
         userId: employee.userId,
-        employeeNumber: employee.employeeNumber,
         firstName: employee.firstName,
         lastName: employee.lastName,
         position: employee.position,

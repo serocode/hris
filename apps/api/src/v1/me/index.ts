@@ -1,53 +1,47 @@
-import type { OpenAPIHono } from '@hono/zod-openapi';
-import { createRoute, z } from '@hono/zod-openapi';
+import { createRoute } from '@hono/zod-openapi';
 import {
-  BadRequestErrorRoute,
   createSuccessResponse,
   NotFoundErrorRoute,
   ServerErrorRoute,
   UnauthorizedErrorRoute,
 } from '@hris-v2/api-routes';
-import {
-  EmployeesDetailsResponse,
-} from '@hris-v2/api-routes/employees';
-import { employeeService } from '@/services/employees';
-import type { App } from '@/types/index';
+import { MeResponse } from '@hris-v2/api-routes/me';
+import { createHonoApp } from '@/lib/hono';
+import { sessionCheck } from '@/middlewares/session';
+import { userService } from '@/services/users';
+import type { App } from '@/types';
 import { formatDate } from '@/utils/common';
 
 const route = createRoute({
-  tags: ['employees'],
-  summary: 'Get employee by employee number',
+  tags: ['me'],
+  summary: 'Get own profile',
   method: 'get',
-  path: '/by-employee-number/{employeeNumber}',
-  request: {
-    params: z.object({
-      employeeNumber: z.string().openapi({ example: '7865439' }),
-    }),
-  },
+  path: '/',
   security: [
     {
       Bearer: [],
     },
   ],
+  middleware: [sessionCheck],
   responses: {
     200: {
       content: {
         'application/json': {
-          schema: EmployeesDetailsResponse,
+          schema: MeResponse,
         },
       },
-      description: 'Employee retrieved successfully',
+      description: 'User profile retrieved successfully',
     },
-    ...BadRequestErrorRoute,
     ...UnauthorizedErrorRoute,
     ...NotFoundErrorRoute,
     ...ServerErrorRoute,
   },
 });
 
-export function getEmployeeByNumberRoute(_app: App, employeeRoute: OpenAPIHono) {
-  employeeRoute.openapi(route, async (c) => {
-    const { employeeNumber } = c.req.valid('param');
+export function meRoutes(_app: App) {
+  const meRoute = createHonoApp();
+
+  meRoute.openapi(route, async (c) => {
     const user = c.get('user');
     const logger = c.get('logger');
 
@@ -55,26 +49,24 @@ export function getEmployeeByNumberRoute(_app: App, employeeRoute: OpenAPIHono) 
       {
         userId: user.id,
         userEmail: user.email,
-        employeeNumber,
       },
-      'Getting employee by employee number',
+      'Fetching user profile',
     );
 
-    const employee = await employeeService.getEmployeeByEmployeeNumber(employeeNumber);
+    const employee = await userService.getProfile(user.id);
 
     logger.info(
       {
         employeeId: employee.id,
-        employeeNumber: employee.employeeNumber,
       },
-      'Employee retrieved successfully',
+      'User profile retrieved successfully',
     );
 
     return c.json(
       createSuccessResponse({
         id: employee.id,
         userId: employee.userId,
-        employeeNumber: employee.employeeNumber,
+        employeeNumber: user.name, // This is employee_number
         firstName: employee.firstName,
         lastName: employee.lastName,
         position: employee.position,
@@ -86,6 +78,9 @@ export function getEmployeeByNumberRoute(_app: App, employeeRoute: OpenAPIHono) 
           ? formatDate(employee.updatedAt, 'YYYY-MM-DDTHH:mm:ssZ')
           : '',
       }),
+      200,
     );
   });
+
+  return meRoute;
 }

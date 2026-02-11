@@ -19,7 +19,6 @@ export const employees = pgTable(
       .unique()
       .references(() => user.id, { onDelete: "cascade" }),
     
-    employeeNumber: text("employee_number").notNull().unique(),
     firstName: text("first_name").notNull(),
     lastName: text("last_name").notNull(),
     position: text("position").notNull(),

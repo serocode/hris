@@ -19,13 +19,20 @@
 			"recommended": true,
 			"a11y": {
 				"useAltText": "error"
+			},
+			"correctness": {
+				"noUnusedVariables": "error",
+				"noUnusedImports": "error"
+			},
+			"suspicious": {
+				"noExplicitAny": "error"
 			}
 		}
 	},
 	"javascript": {
 		"formatter": {
 			"quoteStyle": "double",
-			"semicolons":"asNeeded"
+			"semicolons": "asNeeded"
 		}
 	},
 	"assist": {
@@ -33,7 +40,7 @@
 		"actions": {
 			"source": {
 				"organizeImports": "on",
-				"useSortedProperties":"on"
+				"useSortedProperties": "on"
 			}
 		}
 	}

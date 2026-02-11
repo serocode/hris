@@ -4,6 +4,7 @@ import {
   BadRequestErrorRoute,
   ConflictErrorRoute,
   createSuccessResponse,
+  ForbiddenErrorRoute,
   NotFoundErrorRoute,
   ServerErrorRoute,
   UnauthorizedErrorRoute,
@@ -12,6 +13,7 @@ import {
   EmployeesCreatePayload,
   EmployeesCreateResponse,
 } from '@hris-v2/api-routes/employees';
+import { requirePermission } from '@/middlewares/rbac';
 import { employeeService } from '@/services/employees';
 import type { App } from '@/types/index';
 
@@ -34,6 +36,7 @@ const route = createRoute({
       Bearer: [],
     },
   ],
+  middleware: [requirePermission({ user: ['create'] })],
   responses: {
     201: {
       content: {
@@ -45,6 +48,7 @@ const route = createRoute({
     },
     ...BadRequestErrorRoute,
     ...UnauthorizedErrorRoute,
+    ...ForbiddenErrorRoute,
     ...NotFoundErrorRoute,
     ...ConflictErrorRoute,
     ...ServerErrorRoute,
@@ -61,7 +65,6 @@ export function createEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
       {
         userId: user.id,
         userEmail: user.email,
-        employeeNumber: body.employeeNumber,
       },
       'Creating employee',
     );
@@ -71,7 +74,6 @@ export function createEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
     logger.debug(
       {
         employeeId: result.data.id,
-        employeeNumber: body.employeeNumber,
       },
       'Employee created successfully',
     );
@@ -80,7 +82,6 @@ export function createEmployeeRoute(_app: App, employeeRoute: OpenAPIHono) {
       createSuccessResponse({
         id: result.data.id,
         userId: result.data.userId,
-        employeeNumber: result.data.employeeNumber,
         firstName: result.data.firstName,
         lastName: result.data.lastName,
         position: result.data.position,
