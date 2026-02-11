@@ -1,7 +1,8 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { admin, openAPI, organization, username } from "better-auth/plugins";
+import { admin, openAPI, organization } from "better-auth/plugins";
 import { BETTER_AUTH_URL } from "@/constants/env";
+import { ac, admin as adminRole, user as userRole } from "@/lib/access";
 import { db } from "@/lib/database";
 
 export const auth = betterAuth({
@@ -13,10 +14,22 @@ export const auth = betterAuth({
     enabled: true, 
     requireEmailVerification: false,
   }, 
+  user: {
+    fields: {
+      name: "employee_number",
+      
+    },
+},
   plugins: [ 
-        username(),
         openAPI(),
-        admin({defaultRole: 'user'}),
+        admin({
+            ac,
+            roles: {
+                admin: adminRole,
+                user: userRole,
+            },
+            defaultRole: 'user',
+        }),
         organization(),
     ] 
 });

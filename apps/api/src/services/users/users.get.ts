@@ -1,0 +1,14 @@
+import { ServiceError } from '@/lib/service-error';
+import { employeeRepository } from '@/repositories/employees';
+
+export const getProfile = async (userId: string) => {
+  const employee = await employeeRepository.getEmployeeByUserId(userId);
+  if (!employee) {
+    throw new ServiceError(
+      'PROFILE_NOT_FOUND',
+      'No employee profile found for this user',
+      404,
+    );
+  }
+  return employee;
+};

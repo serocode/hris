@@ -25,6 +25,11 @@
 			"types": "./dist/employees/index.d.ts",
 			"import": "./dist/employees/index.js",
 			"require": "./dist/employees/index.cjs"
+		},
+		"./me": {
+			"types": "./dist/me/index.d.ts",
+			"import": "./dist/me/index.js",
+			"require": "./dist/me/index.cjs"
 		}
 	},
 	"files": [

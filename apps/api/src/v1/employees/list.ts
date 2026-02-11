@@ -2,6 +2,7 @@ import type { OpenAPIHono } from '@hono/zod-openapi';
 import { createRoute } from '@hono/zod-openapi';
 import {
   BadRequestErrorRoute,
+  ForbiddenErrorRoute,
   ServerErrorRoute,
   UnauthorizedErrorRoute,
 } from '@hris-v2/api-routes';
@@ -9,6 +10,7 @@ import {
   EmployeesListQuery,
   EmployeesListResponse,
 } from '@hris-v2/api-routes/employees';
+import { requirePermission } from '@/middlewares/rbac';
 import { employeeService } from '@/services/employees';
 import type { App } from '@/types/index';
 import { formatDate } from '@/utils/common';
@@ -26,6 +28,7 @@ const route = createRoute({
       Bearer: [],
     },
   ],
+  middleware: [requirePermission({ user: ['list'] })],
   responses: {
     200: {
       content: {
@@ -37,11 +40,12 @@ const route = createRoute({
     },
     ...BadRequestErrorRoute,
     ...UnauthorizedErrorRoute,
+    ...ForbiddenErrorRoute,
     ...ServerErrorRoute,
   },
 });
 
-export function listEmployeesRoute(_app: App, employeeRoute: OpenAPIHono) {
+export function listEmployeesRoute(_app: App,employeeRoute: OpenAPIHono) {
   employeeRoute.openapi(route, async (c) => {
     const { limit, offset } = c.req.valid('query');
     const user = c.get('user');
@@ -72,7 +76,6 @@ export function listEmployeesRoute(_app: App, employeeRoute: OpenAPIHono) {
     const mappedData = employees.map((employee) => ({
       id: employee.id,
       userId: employee.userId,
-      employeeNumber: employee.employeeNumber,
       firstName: employee.firstName,
       lastName: employee.lastName,
       position: employee.position,

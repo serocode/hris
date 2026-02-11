@@ -4,7 +4,6 @@ import type { App } from '@/types';
 import { createEmployeeRoute } from './create';
 import { deleteEmployeeRoute } from './delete';
 import { getEmployeeRoute } from './details';
-import { getEmployeeByNumberRoute } from './get-by-number';
 import { getEmployeeByUserIdRoute } from './get-by-user';
 import { listEmployeesRoute } from './list';
 import { updateEmployeeRoute } from './update';
@@ -16,7 +15,6 @@ export function employeeRoutes(app: App) {
 
   createEmployeeRoute(app, employeeRoute);
   getEmployeeRoute(app, employeeRoute);
-  getEmployeeByNumberRoute(app, employeeRoute);
   getEmployeeByUserIdRoute(app, employeeRoute);
   listEmployeesRoute(app, employeeRoute);
   updateEmployeeRoute(app, employeeRoute);

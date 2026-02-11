@@ -14,7 +14,6 @@ export type EmployeesListQuery = z.infer<typeof EmployeesListQuery>
 const EmployeeListItemData = z.object({
 	id: z.string().openapi({ example: "adt819234masdf1m" }),
 	userId: z.string().openapi({ example: "adt819234masdf1m" }),
-	employeeNumber: z.string().openapi({ example: "7865439" }),
 	firstName: z.string().openapi({ example: "John" }),
 	lastName: z.string().openapi({ example: "Doe" }),
 	position: z.string().openapi({ example: "Software Engineer" }),

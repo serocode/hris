@@ -8,28 +8,15 @@ export const updateEmployee = async (
   payload: EmployeesUpdatePayload,
 ) => {
   try {
-    const { hireDate, employeeNumber, ...rest } = payload;
-
-    if (employeeNumber) {
-      const existingEmployee = await employeeRepository.getEmployeeByEmployeeNumber(employeeNumber);
-      if (existingEmployee && existingEmployee.id !== id) {
-        throw new ServiceError(
-          'EMPLOYEE_NUMBER_EXISTS',
-          `Employee number ${employeeNumber} already exists`,
-          400,
-        );
-      }
-    }
+    const { hireDate,  ...rest } = payload;
 
     const updateData: Partial<{
-      employeeNumber: string;
       firstName: string;
       lastName: string;
       position: string;
       hireDate: string;
     }> = {
       ...rest,
-      ...(employeeNumber !== undefined && { employeeNumber }),
       ...(hireDate !== undefined && { hireDate: formatDate(hireDate) }),
     };
 
