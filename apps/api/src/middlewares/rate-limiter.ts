@@ -1,5 +1,5 @@
-import { createTooManyRequestsResponse } from "@hris-v2/api-routes"
 import { createMiddleware } from "hono/factory"
+import { createTooManyRequestsResponse } from "@/lib/http/response-factory"
 import { redisClient } from "@/lib/redis"
 
 export type RateLimitOptions = {
@@ -11,8 +11,21 @@ export type RateLimitOptions = {
 export const rateLimit = (options: RateLimitOptions) => {
 	const { windowMs, max, keyPrefix = "rl:" } = options
 
+	const getClientIp = (rawIp: string | undefined): string => {
+		if (!rawIp) {
+			return "unknown"
+		}
+
+		const firstForwarded = rawIp.split(",")[0]?.trim()
+		return firstForwarded || "unknown"
+	}
+
 	return createMiddleware(async (c, next) => {
-		const ip = c.req.header("x-forwarded-for") || "unknown"
+		const ip = getClientIp(
+			c.req.header("x-forwarded-for") ||
+				c.req.header("cf-connecting-ip") ||
+				c.req.header("x-real-ip"),
+		)
 		const key = `${keyPrefix}${ip}`
 
 		try {
@@ -24,7 +37,12 @@ export const rateLimit = (options: RateLimitOptions) => {
 
 			if (current > max) {
 				const ttl = await redisClient.pttl(key)
-				const retryAfter = Math.ceil(ttl / 1000)
+				const retryAfter = Math.max(
+					1,
+					Math.ceil((ttl > 0 ? ttl : windowMs) / 1000),
+				)
+
+				c.header("Retry-After", retryAfter.toString())
 
 				return c.json(
 					createTooManyRequestsResponse(
@@ -36,7 +54,10 @@ export const rateLimit = (options: RateLimitOptions) => {
 			}
 
 			c.res.headers.set("X-RateLimit-Limit", max.toString())
-			c.res.headers.set("X-RateLimit-Remaining", Math.max(0, max - current).toString())
+			c.res.headers.set(
+				"X-RateLimit-Remaining",
+				Math.max(0, max - current).toString(),
+			)
 
 			await next()
 		} catch (error) {

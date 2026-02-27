@@ -1,33 +1,30 @@
-import { createForbiddenResponse } from '@hris-v2/api-routes';
-import { createMiddleware } from 'hono/factory';
-import { auth } from '@/lib/auth';
+import { createMiddleware } from "hono/factory"
+import { auth } from "@/lib/auth"
+import { createForbiddenResponse } from "@/lib/http/response-factory"
 
-type PermissionRecord = Record<string, string[]>;
+type PermissionRecord = Record<string, string[]>
 
 export const requirePermission = (permissions: PermissionRecord) =>
-  createMiddleware(async (c, next) => {
-    const user = c.get('user');
+	createMiddleware(async (c, next) => {
+		const user = c.get("user")
 
-    if (!user?.role) {
-      return c.json(
-        createForbiddenResponse([{ message: 'Forbidden' }]),
-        403,
-      );
-    }
+		if (!user?.role) {
+			return c.json(createForbiddenResponse([{ message: "Forbidden" }]), 403)
+		}
 
-    const result = await auth.api.userHasPermission({
-      body: {
-        userId: user.id,
-        permissions,
-      },
-    });
+		const result = await auth.api.userHasPermission({
+			body: {
+				userId: user.id,
+				permissions,
+			},
+		})
 
-    if (!result.success) {
-      return c.json(
-        createForbiddenResponse([{ message: 'Insufficient permissions' }]),
-        403,
-      );
-    }
+		if (!result.success) {
+			return c.json(
+				createForbiddenResponse([{ message: "Insufficient permissions" }]),
+				403,
+			)
+		}
 
-    await next();
-  });
+		await next()
+	})

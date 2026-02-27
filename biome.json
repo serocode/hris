@@ -7,7 +7,8 @@
 		"defaultBranch": "main"
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": ["**/*.{ts,tsx,js,jsx,json}", "!**/*.gen.ts"]
 	},
 	"formatter": {
 		"enabled": true,
@@ -43,5 +44,81 @@
 				"useSortedProperties": "on"
 			}
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["apps/ui/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"paths": {
+									"@hris-v2/contracts": "Use subpath imports like @hris-v2/contracts/me or @hris-v2/contracts/errors."
+								},
+								"patterns": [
+									{
+										"group": [
+											"apps/api/*",
+											"apps/api/**",
+											"@hris-v2/api",
+											"@hris-v2/api/*"
+										],
+										"message": "UI must not import API implementation details."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["apps/api/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"paths": {
+									"@hris-v2/contracts": "Use subpath imports like @hris-v2/contracts/me or @hris-v2/contracts/errors."
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"includes": ["packages/contracts/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRestrictedImports": {
+							"level": "error",
+							"options": {
+								"patterns": [
+									{
+										"group": ["@hono/*", "hono", "hono/*"],
+										"message": "Contracts must be framework-agnostic."
+									},
+									{
+										"group": [
+											"apps/api/*",
+											"apps/api/**",
+											"apps/ui/*",
+											"apps/ui/**"
+										],
+										"message": "Contracts must not depend on app code."
+									}
+								]
+							}
+						}
+					}
+				}
+			}
+		}
+	]
 }

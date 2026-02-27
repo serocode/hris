@@ -1,0 +1,46 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Build outputs
+dist
+**/dist
+.next
+**/.next
+.output
+**/.output
+
+# Version control
+.git
+.gitignore
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Turbo cache
+.turbo
+**/.turbo
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dev tools
+coverage
+**/*.test.ts
+**/*.spec.ts
+
+# Misc
+README.md
+Makefile
+Caddyfile
+.husky
+.devcontainer

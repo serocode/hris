@@ -1,10 +1,10 @@
 export class ServiceError extends Error {
-  constructor(
-    public code: string,
-    message: string,
-    public statusCode: number = 500,
-  ) {
-    super(message);
-    this.name = 'ServiceError';
-  }
+	constructor(
+		public code: string,
+		message: string,
+		public statusCode: number = 500,
+	) {
+		super(message)
+		this.name = "ServiceError"
+	}
 }

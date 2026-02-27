@@ -1,107 +1,124 @@
 .SILENT:
-.PHONY: check setup help down
-.DEFAULT_GOAL:= help
+.PHONY: check setup install dev api stop api_db apidb_stop generate studio migrate seed up caddy_start caddy_stop auth-docs api-docs help
+.DEFAULT_GOAL := help
 
+# ==============================================================================
+# VARIABLES
+# ==============================================================================
 EXECUTABLES = pnpm docker caddy
-SERVER_DIR=./apps/api
-DOCKERFILES=./.devcontainer
-COLOR_GREEN=$(shell echo "\033[0;32m")
-COLOR_RED=$(shell echo "\033[0;31m")
-COLOR_END=$(shell echo "\033[0;0m")
+DOCKERFILES = ./.devcontainer
 
+# ==============================================================================
+# LOGGING & ERROR HANDLING
+# ==============================================================================
+# Cross-platform color output using printf to ensure it works on macOS/Linux
 define log
-	echo "\033[0;32m$1\033[0m"
+	printf "\033[0;34m[INFO]\033[0m %s\n" $1
+endef
+
+define success
+	printf "\033[0;32m[SUCCESS]\033[0m %s\n" $1
 endef
 
 define err
-	echo "\033[0;31m$1\033[0m"
+	printf "\033[0;31m[ERROR]\033[0m %s\n" $1 >&2; exit 1
 endef
 
-## ---
-## HELP - SHOWS A LIST OF AVAILABLE TARGETS WHICH CAN BE CALLED WITH MAKE.
-## ---
+# ==============================================================================
+# HELP
+# ==============================================================================
+help: ## Show this help message
+	@echo "Usage: make [target]"
+	@echo ""
+	@echo "Available Targets:"
+	@awk 'BEGIN {FS = ":.*?## "} /^[0-9a-zA-Z_-]+:.*?## / {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
 
-help:
-	@for makefile in $(MAKEFILE_LIST) ; do \
-		grep -E '^[0-9a-zA-Z_-]+:.*?## .*$$' $$makefile | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' ; \
-	done
-
-check: ## Check if all requred executables are installed
-	$(call log,"Checking dependencies...");
+# ==============================================================================
+# ENVIRONMENT & SETUP
+# ==============================================================================
+check: ## Check if all required executables are installed
+	$(call log,"Checking dependencies...")
 	@for exe in $(EXECUTABLES); do \
-		which $$exe > /dev/null || { echo "$(COLOR_RED)Error: \"$$exe\" not found, please install \"$$exe\" and try again.$(COLOR_END)"; exit 1;} \
+		command -v $$exe > /dev/null 2>&1 || { $(call err,"'$$exe' is not installed. Please install it and try again."); }; \
 	done
-	$(call log,"All dependencies are installed!");
+	@docker compose version >/dev/null 2>&1 || { $(call err,"'docker compose' plugin not found. Please verify your Docker installation."); }
+	$(call success,"All basic dependencies are installed!")
 
-setup: check api_db install ## Run all setup command
-
-install: ## Install all dependencies
+install: check ## Install all project dependencies via pnpm
 	$(call log,"Installing dependencies...")
-	@pnpm install
-	$(call log,"Done!")
+	@pnpm install || { $(call err,"Failed to install dependencies."); }
+	$(call success,"Dependencies installed successfully.")
 
-dev: setup caddy_start ## Run pma in development mode
-	$(call log,"Running pma in development mode...")
-	@pnpm run dev
+setup: install api_db caddy_start ## Run comprehensive setup (installs deps, starts db & proxy)
+	$(call success,"Setup complete! You can now run 'make dev' or 'make api'.")
 
-api: setup caddy_start
-	@pnpm api dev
+# ==============================================================================
+# DEVELOPMENT
+# ==============================================================================
+dev: setup ## Run all applications in development mode using Turbo
+	$(call log,"Starting all applications in development mode...")
+	@pnpm turbo run dev
 
-stop: apidb_stop caddy_stop ## Stop all running containers
+api: setup ## Run only the API application in development mode
+	$(call log,"Starting API dynamically...")
+	@pnpm turbo run dev --filter=@hris-v2/api
 
-apidb_stop: ## Stop API database
-	$(call log,"Stopping all running containers...")
-	@docker compose -f $(DOCKERFILES)/docker-compose.api.yml stop
+stop: apidb_stop caddy_stop ## Stop all running services (Docker, Caddy)
+	$(call success,"All services stopped.")
 
-api_db: ## Setup database for API
-	$(call log,"Setting up databases for the API...")
-	@docker compose -f $(DOCKERFILES)/docker-compose.api.yml up -d
+# ==============================================================================
+# DOCKER SERVICES
+# ==============================================================================
+api_db: ## Start the API database container
+	$(call log,"Starting API database...")
+	@docker compose -f $(DOCKERFILES)/docker-compose.yml up -d --wait || { $(call err,"Failed to start the API database. Make sure Docker is running."); }
+	$(call success,"Database is running.")
 
-## ---
-## DRIZZLE COMMANDS
-## ---
+apidb_stop: ## Stop the API database container
+	$(call log,"Stopping API database...")
+	@docker compose -f $(DOCKERFILES)/docker-compose.yml down --remove-orphans || true
 
-generate: ## Generates migration file - does not run the migration
+# ==============================================================================
+# DRIZZLE ORM (Filtered for API)
+# ==============================================================================
+generate: ## Generate a new database migration file
 	$(call log,"Generating migration file...")
-	@pnpm --filter api generate
+	@pnpm --filter=@hris-v2/api generate
 
 studio: ## Run Drizzle Kit Studio
-	$(call log,"Running Drizzle Kit Studio...")
-	@pnpm --filter api studio & sleep 2 && npx open-cli https://local.drizzle.studio
+	$(call log,"Starting Drizzle Kit Studio...")
+	@pnpm --filter=@hris-v2/api studio & sleep 2 && npx open-cli https://local.drizzle.studio
 
-migrate: generate ## Run migration
-	$(call log,"Running migration...")
-	@pnpm --filter api migrate
+migrate: generate ## Run database migrations
+	$(call log,"Running database migrations...")
+	@pnpm --filter=@hris-v2/api migrate
 
-seed: ## Seed database with data
-	$(call log,"Seeding database with data...")
-	@pnpm --filter api seed
+seed: ## Seed the database with initial data
+	$(call log,"Seeding database...")
+	@pnpm --filter=@hris-v2/api seed
 
 up: ## Run drizzle-kit up
 	$(call log,"Running drizzle-kit up...")
-	@pnpm --filter api kit:up
+	@pnpm --filter=@hris-v2/api kit:up
 
-## ---
-## CADDY COMMANDS
-## ---
-
-caddy_start: ## Start Caddy server
+# ==============================================================================
+# CADDY SERVER
+# ==============================================================================
+caddy_start: ## Start the Caddy server
 	$(call log,"Starting Caddy server...")
-	@caddy start
+	@caddy start 2>/dev/null || $(call log,"Caddy might already be running.")
 
-caddy_stop: ## Stop Caddy server
+caddy_stop: ## Stop the Caddy server
 	$(call log,"Stopping Caddy server...")
-	@caddy stop || true
+	@caddy stop > /dev/null 2>&1 || true
 
-## ---
-## BETTERAUTH COMMANDS
-## ---
-
+# ==============================================================================
+# DOCUMENTATION
+# ==============================================================================
 auth-docs: ## Open BetterAuth documentation
 	$(call log,"Opening BetterAuth documentation...")
-	@pnpm --filter api auth-docs
+	@pnpm --filter=@hris-v2/api auth-docs
 
 api-docs: ## Open API documentation
 	$(call log,"Opening API documentation...")
-	@pnpm open-cli https://api.hris.localhost/docs
-
+	@npx open-cli https://api.hris.localhost/docs

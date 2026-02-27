@@ -1,0 +1,45 @@
+{
+	"name": "@hris-v2/ui",
+	"description": "",
+	"version": "1.0.0",
+	"author": "",
+	"dependencies": {
+		"@tanstack/react-query": "^5.90.21",
+		"@tanstack/react-router": "^1.160.2",
+		"better-auth": "^1.4.18",
+		"clsx": "^2.1.1",
+		"hono": "^4.11.9",
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4",
+		"tailwind-merge": "^3.4.1",
+		"tailwindcss": "^4.1.18",
+		"zod": "^4.3.6"
+	},
+	"devDependencies": {
+		"@hris-v2/contracts": "workspace:*",
+		"@hris-v2/tsconfig": "workspace:*",
+		"@tailwindcss/vite": "catalog:",
+		"@tanstack/react-start": "catalog:",
+		"@types/node": "^24.10.7",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^5.1.4",
+		"typescript": "^5.9.3",
+		"vite": "catalog:",
+		"vite-tsconfig-paths": "^6.1.1",
+		"vitest": "^3.2.4"
+	},
+	"keywords": [],
+	"license": "ISC",
+	"main": "index.js",
+	"packageManager": "pnpm@10.28.0",
+	"scripts": {
+		"build": "vite build",
+		"check-types": "tsc --noEmit",
+		"dev": "NODE_TLS_REJECT_UNAUTHORIZED=0 vite dev",
+		"lint": "biome check .",
+		"start": "node dist/server/server.js",
+		"test": "vitest run"
+	},
+	"type": "module"
+}

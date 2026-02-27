@@ -1,0 +1,17 @@
+{
+	"name": "@hris-v2/tsconfig",
+	"version": "0.0.0",
+	"files": [
+		"base.json",
+		"api.json",
+		"ui.json",
+		"library.json"
+	],
+	"private": true,
+	"scripts": {
+		"build": "node -e \"console.log('No build step for @hris-v2/tsconfig')\"",
+		"check-types": "node -e \"console.log('No typecheck step for @hris-v2/tsconfig')\"",
+		"lint": "node -e \"console.log('No lint step for @hris-v2/tsconfig')\"",
+		"test": "node -e \"console.log('No test step for @hris-v2/tsconfig')\""
+	}
+}

@@ -1,0 +1,95 @@
+# .devcontainer/docker-compose.yml
+services:
+  # -------------------------
+  # INFRASTRUCTURE (Default)
+  # -------------------------
+  db-hris:
+    image: postgres:17-alpine
+    container_name: hris-postgres
+    environment:
+      POSTGRES_USER: hris_admin
+      POSTGRES_PASSWORD: hris_password
+      POSTGRES_DB: hris
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-hris-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hris_admin -d hris"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis-hris:
+    image: redis:7-alpine
+    container_name: hris-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-hris-data:/data
+      - ./redis-conf:/usr/local/etc/redis
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: hris-redis-insight
+    ports:
+      - "5540:5540"
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    container_name: hris-mailpit
+    environment:
+      MP_MAX_MESSAGES: 500
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+    restart: unless-stopped
+
+  # -------------------------
+  # APPS (Optional for local)
+  # -------------------------
+  # Use `docker compose --profile apps up` to run these
+  api:
+    profiles: ["apps"]
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    ports:
+      - "3333:3333"
+    environment:
+      - DATABASE_URL=postgres://hris_admin:hris_password@db-hris:5432/hris
+      - REDIS_URL=redis://redis-hris:6379
+      - SMTP_HOST=mailpit
+      - SMTP_PORT=1025
+    depends_on:
+      db-hris:
+        condition: service_healthy
+      redis-hris:
+        condition: service_healthy
+
+  ui:
+    profiles: ["apps"]
+    build:
+      context: ..
+      dockerfile: apps/ui/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:3333
+    depends_on:
+      - api
+
+volumes:
+  db-hris-data:
+    driver: local
+  redis-hris-data:
+    driver: local
