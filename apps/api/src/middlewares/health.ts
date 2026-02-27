@@ -1,21 +1,27 @@
-import type { Context } from 'hono';
-import { auth } from '@/lib/auth';
-import { pg } from '@/lib/database';
-import { redisClient } from '@/lib/redis';
-import { getLogger } from './logger';
+import type { Context } from "hono"
+import { auth } from "@/lib/auth"
+import { pg } from "@/lib/database"
+import { redisClient } from "@/lib/redis"
+import { getLogger } from "./logger"
 
-const logger = getLogger();
+const logger = getLogger()
 
 interface HealthCheckResult {
-	status: 'healthy' | 'unhealthy';
+	status: "healthy" | "unhealthy"
 	checks: {
-		db: boolean;
-		redis: boolean;
-		auth: boolean;
-	};
-	timestamp: string;
-	version: string;
-	uptime: number;
+		db: boolean
+		redis: boolean
+		auth: boolean
+	}
+	timestamp: string
+	version: string
+	uptime: number
+}
+
+type HealthCheckDependencies = {
+	checkDatabase?: () => Promise<boolean>
+	checkRedis?: () => Promise<boolean>
+	checkAuth?: () => Promise<boolean>
 }
 
 /**
@@ -23,14 +29,14 @@ interface HealthCheckResult {
  */
 async function checkDatabase(): Promise<boolean> {
 	try {
-		await pg`SELECT 1`;
-		return true;
+		await pg`SELECT 1`
+		return true
 	} catch (error) {
 		logger.error(
 			{ error: error instanceof Error ? error.message : String(error) },
-			'Health check failed: Database',
-		);
-		return false;
+			"Health check failed: Database",
+		)
+		return false
 	}
 }
 
@@ -39,14 +45,14 @@ async function checkDatabase(): Promise<boolean> {
  */
 async function checkRedis(): Promise<boolean> {
 	try {
-		await redisClient.ping();
-		return true;
+		await redisClient.ping()
+		return true
 	} catch (error) {
 		logger.error(
 			{ error: error instanceof Error ? error.message : String(error) },
-			'Health check failed: Redis',
-		);
-		return false;
+			"Health check failed: Redis",
+		)
+		return false
 	}
 }
 
@@ -55,58 +61,56 @@ async function checkRedis(): Promise<boolean> {
  */
 async function checkAuth(): Promise<boolean> {
 	try {
-		// Quick check - just verify auth API is responsive
-		// This doesn't need a valid session, just connectivity
-		await auth.api.getSession({ headers: new Headers() }).catch(() => null);
-		return true;
+		await auth.api.getSession({ headers: new Headers() })
+		return true
 	} catch (error) {
 		logger.error(
 			{ error: error instanceof Error ? error.message : String(error) },
-			'Health check failed: Auth Service',
-		);
-		return false;
+			"Health check failed: Auth Service",
+		)
+		return false
 	}
 }
 
-/**
- * Comprehensive health check endpoint
- * Verifies all critical dependencies are functional
- */
-export function healthCheck() {
+export function healthCheck(dependencies: HealthCheckDependencies = {}) {
+	const checkDb = dependencies.checkDatabase || checkDatabase
+	const checkCache = dependencies.checkRedis || checkRedis
+	const checkAuthService = dependencies.checkAuth || checkAuth
+
 	return async (c: Context) => {
-		const startTime = Date.now();
+		const startTime = Date.now()
 
 		const [dbHealthy, redisHealthy, authHealthy] = await Promise.all([
-			checkDatabase(),
-			checkRedis(),
-			checkAuth(),
-		]);
+			checkDb(),
+			checkCache(),
+			checkAuthService(),
+		])
 
-		const allHealthy = dbHealthy && redisHealthy && authHealthy;
+		const allHealthy = dbHealthy && redisHealthy && authHealthy
 
 		const healthResult: HealthCheckResult = {
-			status: allHealthy ? 'healthy' : 'unhealthy',
+			status: allHealthy ? "healthy" : "unhealthy",
 			checks: {
 				db: dbHealthy,
 				redis: redisHealthy,
 				auth: authHealthy,
 			},
 			timestamp: new Date().toISOString(),
-			version: process.env.npm_package_version || '1.0.0',
+			version: process.env.npm_package_version || "1.0.0",
 			uptime: Math.floor(process.uptime()),
-		};
+		}
 
-		const responseTime = Date.now() - startTime;
+		const responseTime = Date.now() - startTime
 		logger.info(
 			{
 				...healthResult,
 				responseTimeMs: responseTime,
 			},
-			'Health check completed',
-		);
+			"Health check completed",
+		)
 
-		return c.json(healthResult, allHealthy ? 200 : 503);
-	};
+		return c.json(healthResult, allHealthy ? 200 : 503)
+	}
 }
 
 /**
@@ -115,22 +119,23 @@ export function healthCheck() {
  */
 export function livenessProbe() {
 	return async (c: Context) => {
-		return c.json({ status: 'alive', timestamp: new Date().toISOString() }, 200);
-	};
+		return c.json({ status: "alive", timestamp: new Date().toISOString() }, 200)
+	}
 }
 
-/**
- * Readiness probe - checks if the server can accept traffic
- * More comprehensive than liveness
- */
-export function readinessProbe() {
+export function readinessProbe(dependencies: HealthCheckDependencies = {}) {
+	const checkDb = dependencies.checkDatabase || checkDatabase
+
 	return async (c: Context) => {
-		const [dbHealthy] = await Promise.all([checkDatabase()]);
+		const [dbHealthy] = await Promise.all([checkDb()])
 
 		if (dbHealthy) {
-			return c.json({ status: 'ready', timestamp: new Date().toISOString() }, 200);
+			return c.json(
+				{ status: "ready", timestamp: new Date().toISOString() },
+				200,
+			)
 		}
 
-		return c.json({ status: 'not ready', reason: 'Database unavailable' }, 503);
-	};
+		return c.json({ status: "not ready", reason: "Database unavailable" }, 503)
+	}
 }

@@ -33,29 +33,18 @@ queueEvents.on("completed", ({ jobId }) => {
 	logger.info(`Mail job ${jobId} completed successfully`)
 })
 
-/**
- * Nodemailer transporter configuration
- * Uses secure connection in production, plain in development
- */
 const transporter = nodemailer.createTransport({
 	host: SMTP_HOST,
 	port: SMTP_PORT,
 	secure: NODE_ENV === "production",
 })
 
-/**
- * Mail worker that processes email jobs from the queue.
- * Handles sending emails via nodemailer with proper logging and error handling.
- */
 export const mailWorker = new Worker<MailJobData>(
 	MAIL_QUEUE,
 	async (job) => {
 		const { to, subject, text, html, from } = job.data
 
-		logger.info(
-			{ jobId: job.id, to, subject },
-			"Processing mail job",
-		)
+		logger.info({ jobId: job.id, to, subject }, "Processing mail job")
 
 		try {
 			const result = await transporter.sendMail({

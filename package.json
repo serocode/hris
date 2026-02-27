@@ -18,21 +18,28 @@
 		]
 	},
 	"packageManager": "pnpm@10.28.0",
+	"pnpm": {
+		"overrides": {
+			"vite": "^7.3.1"
+		}
+	},
 	"private": true,
 	"scripts": {
 		"api": "pnpm --filter @hris-v2/api",
-		"build": "dotenv -- turbo build",
+		"build": "dotenv -- turbo run build",
 		"check-types": "turbo run check-types",
-		"dev": "dotenv -- turbo dev",
+		"dev": "dotenv -- turbo run dev",
 		"format": "biome format --write .",
-		"lint": "biome check .",
+		"lint": "turbo run lint",
 		"lint:fix": "biome check --write .",
+		"lint:repo": "biome check .",
 		"postinstall": "pnpm run syncpack:fix && pnpm run syncpack:format",
 		"prepare": "husky",
 		"syncpack:fix": "syncpack fix-mismatches",
 		"syncpack:format": "syncpack format",
 		"syncpack:list": "syncpack list",
 		"syncpack:mismatch": "syncpack list-mismatches",
+		"test": "turbo run test",
 		"ui": "pnpm --filter @hris-v2/ui"
 	}
 }

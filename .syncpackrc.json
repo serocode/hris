@@ -5,6 +5,18 @@
 			"dependencies": ["@hris-v2/**"],
 			"dependencyTypes": ["dev", "prod"],
 			"pinVersion": "workspace:*"
+		},
+		{
+			"label": "Ignore pnpm overrides",
+			"packages": ["**"],
+			"dependencyTypes": ["pnpmOverrides"],
+			"isIgnored": true
+		},
+		{
+			"label": "Ignore catalog references",
+			"packages": ["**"],
+			"specifierTypes": ["catalog"],
+			"isIgnored": true
 		}
 	]
 }

@@ -1,10 +1,11 @@
 {
 	"$schema": "https://turborepo.com/schema.json",
 	"ui": "tui",
-	"globalEnv": ["NODE_ENV", "API_PORT", "LOG_LEVEL"],
+	"globalEnv": ["NODE_ENV", "API_PORT", "LOG_LEVEL", "VITE_API_URL"],
 	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],
+			"env": ["VITE_*"],
 			"outputs": ["dist/**", ".next/**", "!.next/cache/**"]
 		},
 		"lint": {
@@ -17,7 +18,7 @@
 		},
 		"test": {
 			"dependsOn": ["^build"],
-			"outputs": ["coverage/**"]
+			"outputs": []
 		},
 		"db:generate": {
 			"cache": false
@@ -29,6 +30,7 @@
 			"cache": false,
 			"persistent": true,
 			"env": [
+				"VITE_*",
 				"BETTER_AUTH_SECRET",
 				"BETTER_AUTH_URL",
 				"POSTGRES_HOST",

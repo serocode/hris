@@ -1,0 +1,36 @@
+{
+	"name": "@hris-v2/utils",
+	"description": "Shared utility functions",
+	"version": "1.0.0",
+	"author": "",
+	"dependencies": {
+		"dayjs": "^1.11.19"
+	},
+	"devDependencies": {
+		"@hris-v2/tsconfig": "workspace:*",
+		"@types/node": "^24.10.7",
+		"tsup": "^8.5.0",
+		"typescript": "^5.9.3"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"private": true,
+	"scripts": {
+		"build": "tsup",
+		"check-types": "tsc --noEmit",
+		"lint": "biome check .",
+		"test": "echo \"No tests configured\" && exit 0"
+	},
+	"type": "module",
+	"types": "./dist/index.d.ts"
+}
