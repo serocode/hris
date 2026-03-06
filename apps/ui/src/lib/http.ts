@@ -106,8 +106,12 @@ export async function http<TResponse>(
 	const parsed = schema.safeParse(payload)
 
 	if (!parsed.success) {
+		const firstError = parsed.error.issues[0]
+		const errorPath = firstError?.path.join(".") || "unknown"
+		const errorMessage = firstError?.message || "unknown error"
+
 		throw new ApiError({
-			message: "Received an invalid response from the server.",
+			message: `Received an invalid response from the server. (Field: ${errorPath} - ${errorMessage})`,
 			status: response.status,
 			details: parsed.error.issues,
 		})
