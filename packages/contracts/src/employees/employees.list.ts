@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { EmployeeData } from "./_base"
+import { EmployeeData } from "./_base.js"
 
 export const EmployeesListQuery = z.object({
 	limit: z.coerce.number().min(1).max(100).default(100),

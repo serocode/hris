@@ -1,2 +1,2 @@
-export * from "./admin.provisioning"
-export * from "./admin.users"
+export * from "./admin.provisioning.js"
+export * from "./admin.users.js"

@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { MeResponse } from "./me.get"
+import { MeResponse } from "./me.get.js"
 
 export const MeUpdateFieldsSchema = z.object({
 	firstName: z.string().trim().min(2).optional(),

@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { EmployeeData } from "./_base"
+import { EmployeeData } from "./_base.js"
 
 export const EmployeesDeleteParams = z.object({
 	id: z.string(),

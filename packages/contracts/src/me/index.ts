@@ -1,2 +1,2 @@
-export * from "./me.get"
-export * from "./me.update"
+export * from "./me.get.js"
+export * from "./me.update.js"

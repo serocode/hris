@@ -1,2 +1,2 @@
-export * from "./errors"
-export * from "./files"
+export * from "./errors.js"
+export * from "./files.js"
